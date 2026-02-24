@@ -1,0 +1,70 @@
+﻿using System.Net.Http;
+using System.Net.Http.Json;
+using climaster.Models;
+
+namespace climaster.Services;
+
+public class WeatherService
+{
+    private readonly HttpClient _httpClient;
+    private const string API_KEY = "51e154b61c72032ef18f3b7eea32a959";
+    private const string BASE_URL = "https://api.openweathermap.org/data/3.0/onecall";
+
+    public WeatherService()
+    {
+        _httpClient = new HttpClient();
+    }
+
+    public async Task<WeatherData?> GetWeatherDataAsync(double latitude, double longitude)
+    {
+        try
+        {
+            var url = $"{BASE_URL}?lat={latitude}&lon={longitude}&appid={API_KEY}&units=metric&lang=es";
+            var response = await _httpClient.GetFromJsonAsync<WeatherData>(url);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error getting weather data: {ex.Message}");
+            return null;
+        }
+    }
+
+    public string GetWeatherIcon(string iconCode)
+    {
+        // Mapeo de iconos de OpenWeatherMap a emojis/símbolos
+        return iconCode switch
+        {
+            "01d" => "??",  // Clear sky day
+            "01n" => "??",  // Clear sky night
+            "02d" => "?",  // Few clouds day
+            "02n" => "??",  // Few clouds night
+            "03d" or "03n" => "??",  // Scattered clouds
+            "04d" or "04n" => "??",  // Broken clouds
+            "09d" or "09n" => "???",  // Shower rain
+            "10d" => "???",  // Rain day
+            "10n" => "???",  // Rain night
+            "11d" or "11n" => "??",  // Thunderstorm
+            "13d" or "13n" => "??",  // Snow
+            "50d" or "50n" => "???",  // Mist
+            _ => "???"
+        };
+    }
+
+    public string GetWeatherBackground(string iconCode)
+    {
+        // Gradientes para diferentes condiciones climáticas
+        return iconCode switch
+        {
+            "01d" => "#FFB75E, #ED8F03",  // Soleado
+            "01n" => "#2C5364, #203A43, #0F2027",  // Noche clara
+            "02d" or "03d" or "04d" => "#89CFF0, #4A90E2",  // Nublado
+            "02n" or "03n" or "04n" => "#434343, #000000",  // Nublado noche
+            "09d" or "09n" or "10d" or "10n" => "#536976, #292E49",  // Lluvia
+            "11d" or "11n" => "#141E30, #243B55",  // Tormenta
+            "13d" or "13n" => "#E6DADA, #274046",  // Nieve
+            "50d" or "50n" => "#606c88, #3f4c6b",  // Niebla
+            _ => "#56CCF2, #2F80ED"
+        };
+    }
+}

@@ -1,0 +1,78 @@
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace climaster.Models;
+
+public class WidgetSettings : INotifyPropertyChanged
+{
+    private double _latitude = 43.31;
+    private double _longitude = -1.98;
+    private int _refreshInterval = 30; // minutuak
+    private double _widgetOpacity = 0.9;
+    private double _widgetScale = 1.0;
+    private bool _showHourlyForecast = true;
+    private bool _showDailyForecast = true;
+    private string _locationName = "Donostia";
+    private bool _useCurrentLocation = false;
+
+    public double Latitude
+    {
+        get => _latitude;
+        set { _latitude = value; OnPropertyChanged(); }
+    }
+
+    public double Longitude
+    {
+        get => _longitude;
+        set { _longitude = value; OnPropertyChanged(); }
+    }
+
+    public int RefreshInterval
+    {
+        get => _refreshInterval;
+        set { _refreshInterval = value; OnPropertyChanged(); }
+    }
+
+    public double WidgetOpacity
+    {
+        get => _widgetOpacity;
+        set { _widgetOpacity = value; OnPropertyChanged(); }
+    }
+
+    public double WidgetScale
+    {
+        get => _widgetScale;
+        set { _widgetScale = value; OnPropertyChanged(); }
+    }
+
+    public bool ShowHourlyForecast
+    {
+        get => _showHourlyForecast;
+        set { _showHourlyForecast = value; OnPropertyChanged(); }
+    }
+
+    public bool ShowDailyForecast
+    {
+        get => _showDailyForecast;
+        set { _showDailyForecast = value; OnPropertyChanged(); }
+    }
+
+    public string LocationName
+    {
+        get => _locationName;
+        set { _locationName = value; OnPropertyChanged(); }
+    }
+
+    public bool UseCurrentLocation
+    {
+        get => _useCurrentLocation;
+        set { _useCurrentLocation = value; OnPropertyChanged(); }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}

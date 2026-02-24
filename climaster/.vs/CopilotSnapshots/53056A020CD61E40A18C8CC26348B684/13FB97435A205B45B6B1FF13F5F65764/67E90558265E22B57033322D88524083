@@ -1,0 +1,221 @@
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Threading;
+using climaster.Models;
+using climaster.Services;
+
+namespace climaster.ViewModels;
+
+public class WeatherViewModel : INotifyPropertyChanged
+{
+    private readonly WeatherService _weatherService;
+    private readonly LocationService _locationService;
+    private readonly DispatcherTimer _refreshTimer;
+    private WeatherData? _weatherData;
+    private bool _isLoading;
+    private string _errorMessage = string.Empty;
+    private bool _useCurrentLocation;
+
+    public WeatherViewModel()
+    {
+        _weatherService = new WeatherService();
+        _locationService = new LocationService();
+        
+        // Cargar configuración guardada o usar la predeterminada
+        Settings = SettingsManager.LoadSettings() ?? new WidgetSettings();
+        
+        _refreshTimer = new DispatcherTimer();
+        _refreshTimer.Tick += async (s, e) => await RefreshWeatherAsync();
+        UpdateRefreshInterval();
+
+        Settings.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(WidgetSettings.RefreshInterval))
+                UpdateRefreshInterval();
+            
+            // Guardar configuración cuando cambie
+            SettingsManager.SaveSettings(Settings);
+        };
+    }
+
+    public WidgetSettings Settings { get; }
+
+    public WeatherData? WeatherData
+    {
+        get => _weatherData;
+        set { _weatherData = value; OnPropertyChanged(); }
+    }
+
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set { _isLoading = value; OnPropertyChanged(); }
+    }
+
+    public string ErrorMessage
+    {
+        get => _errorMessage;
+        set { _errorMessage = value; OnPropertyChanged(); }
+    }
+
+    public bool UseCurrentLocation
+    {
+        get => _useCurrentLocation;
+        set
+        {
+            _useCurrentLocation = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string CurrentTemperature => WeatherData?.Current != null 
+        ? $"{Math.Round(WeatherData.Current.Temperature)}°C" 
+        : "--°C";
+
+    public string CurrentDescription => WeatherData?.Current?.Weather?.FirstOrDefault()?.Description ?? "Sin datos";
+
+    public string WeatherIcon => WeatherData?.Current?.Weather?.FirstOrDefault()?.Icon != null
+        ? _weatherService.GetWeatherIcon(WeatherData.Current.Weather.First().Icon)
+        : "🌤️";
+
+    public string BackgroundGradient => WeatherData?.Current?.Weather?.FirstOrDefault()?.Icon != null
+        ? _weatherService.GetWeatherBackground(WeatherData.Current.Weather.First().Icon)
+        : "#56CCF2, #2F80ED";
+
+    public string Humidity => WeatherData?.Current != null 
+        ? $"{WeatherData.Current.Humidity}%" 
+        : "--%";
+
+    public string WindSpeed => WeatherData?.Current != null 
+        ? $"{Math.Round(WeatherData.Current.WindSpeed)} km/h" 
+        : "-- km/h";
+
+    public string FeelsLike => WeatherData?.Current != null 
+        ? $"{Math.Round(WeatherData.Current.FeelsLike)}°C" 
+        : "--°C";
+
+    public async Task InitializeAsync()
+    {
+        await RefreshWeatherAsync();
+        _refreshTimer.Start();
+    }
+
+    public async Task RefreshWeatherAsync()
+    {
+        IsLoading = true;
+        ErrorMessage = string.Empty;
+
+        try
+        {
+            double latitude = Settings.Latitude;
+            double longitude = Settings.Longitude;
+
+            // Si está habilitada la ubicación actual, obtenerla
+            if (UseCurrentLocation)
+            {
+                var location = await _locationService.GetCurrentLocationAsync();
+                if (location.HasValue)
+                {
+                    latitude = location.Value.Latitude;
+                    longitude = location.Value.Longitude;
+                    
+                    // Actualizar el nombre de ubicación
+                    Settings.LocationName = location.Value.LocationName;
+                }
+                else
+                {
+                    ErrorMessage = "No se pudo obtener la ubicación actual. Usando ubicación configurada.";
+                    // Usar coordenadas configuradas como fallback
+                }
+            }
+
+            WeatherData = await _weatherService.GetWeatherDataAsync(latitude, longitude);
+
+            if (WeatherData == null)
+            {
+                ErrorMessage = "No se pudo obtener los datos del tiempo";
+            }
+            else
+            {
+                // Notificar cambios en todas las propiedades calculadas
+                OnPropertyChanged(nameof(CurrentTemperature));
+                OnPropertyChanged(nameof(CurrentDescription));
+                OnPropertyChanged(nameof(WeatherIcon));
+                OnPropertyChanged(nameof(BackgroundGradient));
+                OnPropertyChanged(nameof(Humidity));
+                OnPropertyChanged(nameof(WindSpeed));
+                OnPropertyChanged(nameof(FeelsLike));
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    /// <summary>
+    /// Obtiene y aplica la ubicación actual del dispositivo
+    /// </summary>
+    public async Task<bool> UseMyLocationAsync()
+    {
+        IsLoading = true;
+        ErrorMessage = string.Empty;
+
+        try
+        {
+            var location = await _locationService.GetCurrentLocationAsync();
+            
+            if (location.HasValue)
+            {
+                Settings.Latitude = location.Value.Latitude;
+                Settings.Longitude = location.Value.Longitude;
+                Settings.LocationName = location.Value.LocationName;
+                
+                UseCurrentLocation = true;
+                
+                // Actualizar datos del tiempo con la nueva ubicación
+                await RefreshWeatherAsync();
+                
+                return true;
+            }
+            else
+            {
+                ErrorMessage = "No se pudo obtener tu ubicación. Verifica que tengas habilitado el servicio de ubicación en Windows.";
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error obteniendo ubicación: {ex.Message}";
+            return false;
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    /// <summary>
+    /// Verifica si el servicio de ubicación está disponible
+    /// </summary>
+    public async Task<bool> CheckLocationAvailabilityAsync()
+    {
+        return await _locationService.IsLocationAvailableAsync();
+    }
+
+    private void UpdateRefreshInterval()
+    {
+        _refreshTimer.Interval = TimeSpan.FromMinutes(Settings.RefreshInterval);
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}

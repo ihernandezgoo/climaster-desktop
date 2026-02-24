@@ -1,0 +1,83 @@
+﻿using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using climaster.ViewModels;
+
+namespace climaster
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        private readonly WeatherViewModel _viewModel;
+        private WeatherWidget? _widget;
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            
+            _viewModel = new WeatherViewModel();
+            DataContext = _viewModel;
+
+            Loaded += MainWindow_Loaded;
+        }
+
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Inicializar el ViewModel
+            await _viewModel.InitializeAsync();
+
+            // Crear y mostrar el widget
+            ShowWidget();
+
+            // Minimizar la ventana principal al inicio
+            WindowState = WindowState.Minimized;
+        }
+
+        private void ShowWidget()
+        {
+            if (_widget == null || !_widget.IsLoaded)
+            {
+                _widget = new WeatherWidget(_viewModel);
+                _widget.Show();
+            }
+        }
+
+        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            await _viewModel.RefreshWeatherAsync();
+        }
+
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        protected override void OnStateChanged(EventArgs e)
+        {
+            base.OnStateChanged(e);
+
+            // Asegurar que el widget siempre esté visible
+            if (WindowState == WindowState.Minimized)
+            {
+                ShowWidget();
+            }
+        }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            
+            // Cerrar el widget también
+            _widget?.Close();
+        }
+    }
+}

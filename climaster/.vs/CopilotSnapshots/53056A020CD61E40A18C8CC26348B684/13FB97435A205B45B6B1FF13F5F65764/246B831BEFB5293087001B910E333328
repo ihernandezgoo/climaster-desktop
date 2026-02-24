@@ -1,0 +1,139 @@
+﻿using System;
+using System.Threading.Tasks;
+using Windows.Devices.Geolocation;
+
+namespace climaster.Services;
+
+public class LocationService
+{
+    private Geolocator? _geolocator;
+
+    public LocationService()
+    {
+        try
+        {
+            _geolocator = new Geolocator();
+            _geolocator.DesiredAccuracy = PositionAccuracy.Default;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error initializing geolocator: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Obtiene la ubicación actual del dispositivo
+    /// </summary>
+    public async Task<(double Latitude, double Longitude, string LocationName)?> GetCurrentLocationAsync()
+    {
+        try
+        {
+            if (_geolocator == null)
+            {
+                return null;
+            }
+
+            // Verificar acceso a la ubicación
+            var accessStatus = await Geolocator.RequestAccessAsync();
+            
+            if (accessStatus != GeolocationAccessStatus.Allowed)
+            {
+                System.Diagnostics.Debug.WriteLine("Acceso a ubicación denegado");
+                return null;
+            }
+
+            // Obtener posición actual con timeout de 10 segundos
+            var position = await _geolocator.GetGeopositionAsync()
+                .AsTask()
+                .ConfigureAwait(false);
+
+            if (position?.Coordinate != null)
+            {
+                var latitude = position.Coordinate.Point.Position.Latitude;
+                var longitude = position.Coordinate.Point.Position.Longitude;
+
+                // Obtener nombre de la ciudad (si está disponible)
+                var locationName = await GetCityNameFromCoordinatesAsync(latitude, longitude);
+
+                return (latitude, longitude, locationName);
+            }
+
+            return null;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            System.Diagnostics.Debug.WriteLine("Acceso a ubicación no autorizado. Habilita la ubicación en Windows.");
+            return null;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error obteniendo ubicación: {ex.Message}");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Verifica si el servicio de ubicación está disponible
+    /// </summary>
+    public async Task<bool> IsLocationAvailableAsync()
+    {
+        try
+        {
+            var accessStatus = await Geolocator.RequestAccessAsync();
+            return accessStatus == GeolocationAccessStatus.Allowed;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Obtiene el nombre de la ciudad usando geocodificación inversa
+    /// </summary>
+    private async Task<string> GetCityNameFromCoordinatesAsync(double latitude, double longitude)
+    {
+        try
+        {
+            // Usar un servicio de geocodificación inversa (OpenStreetMap Nominatim)
+            using var httpClient = new System.Net.Http.HttpClient();
+            httpClient.DefaultRequestHeaders.Add("User-Agent", "CliMaster/1.0");
+            
+            var url = $"https://nominatim.openstreetmap.org/reverse?format=json&lat={latitude}&lon={longitude}&zoom=10&addressdetails=1";
+            var response = await httpClient.GetStringAsync(url);
+            
+            // Parse básico del JSON
+            var cityMatch = System.Text.RegularExpressions.Regex.Match(response, @"""city""\s*:\s*""([^""]+)""");
+            if (cityMatch.Success)
+            {
+                return cityMatch.Groups[1].Value;
+            }
+
+            var townMatch = System.Text.RegularExpressions.Regex.Match(response, @"""town""\s*:\s*""([^""]+)""");
+            if (townMatch.Success)
+            {
+                return townMatch.Groups[1].Value;
+            }
+
+            var villageMatch = System.Text.RegularExpressions.Regex.Match(response, @"""village""\s*:\s*""([^""]+)""");
+            if (villageMatch.Success)
+            {
+                return villageMatch.Groups[1].Value;
+            }
+
+            return "Ubicación Actual";
+        }
+        catch
+        {
+            return "Ubicación Actual";
+        }
+    }
+
+    /// <summary>
+    /// Obtiene el estado de acceso a ubicación
+    /// </summary>
+    public static async Task<GeolocationAccessStatus> GetLocationAccessStatusAsync()
+    {
+        return await Geolocator.RequestAccessAsync();
+    }
+}

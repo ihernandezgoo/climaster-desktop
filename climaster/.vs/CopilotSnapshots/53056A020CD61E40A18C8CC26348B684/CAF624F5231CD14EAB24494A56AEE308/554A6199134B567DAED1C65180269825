@@ -1,0 +1,311 @@
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Threading;
+using climaster.Models;
+using climaster.Services;
+using System.Collections.ObjectModel;
+
+namespace climaster.ViewModels;
+
+public class WeatherViewModel : INotifyPropertyChanged
+{
+    private readonly WeatherService _weatherService;
+    private readonly LocationService _locationService;
+    private readonly DispatcherTimer _refreshTimer;
+    private WeatherData? _weatherData;
+    private bool _isLoading;
+    private string _errorMessage = string.Empty;
+    private bool _useCurrentLocation;
+    private Location? _selectedLocation;
+
+    public WeatherViewModel()
+    {
+        _weatherService = new WeatherService();
+        _locationService = new LocationService();
+        
+        // Gordetako konfigurazioa kargatu edo lehenetsia erabili
+        Settings = SettingsManager.LoadSettings() ?? new WidgetSettings();
+        
+        // Hasieratu erabilgarri dauden kokapenak
+        InitializeAvailableLocations();
+        
+        _refreshTimer = new DispatcherTimer();
+        _refreshTimer.Tick += async (s, e) => await RefreshWeatherAsync();
+        UpdateRefreshInterval();
+
+        Settings.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(WidgetSettings.RefreshInterval))
+                UpdateRefreshInterval();
+            
+            // Konfigurazioa aldatu denean gorde
+            SettingsManager.SaveSettings(Settings);
+        };
+    }
+
+    public WidgetSettings Settings { get; }
+    public ObservableCollection<Location> AvailableLocations { get; private set; } = new();
+
+    public Location? SelectedLocation
+    {
+        get => _selectedLocation;
+        set
+        {
+            _selectedLocation = value;
+            OnPropertyChanged();
+            
+            if (value != null)
+            {
+                ApplyLocation(value);
+            }
+        }
+    }
+
+    private void InitializeAvailableLocations()
+    {
+        AvailableLocations.Clear();
+        
+        // Gehitu azkeneko kokapenak lehenik
+        if (Settings.RecentLocations?.Any() == true)
+        {
+            foreach (var recent in Settings.RecentLocations.OrderByDescending(l => l.LastUsed))
+            {
+                AvailableLocations.Add(recent);
+            }
+        }
+        
+        // Gehitu Euskal Herriko kokapenak
+        foreach (var location in PredefinedLocations.GetEuskalHerriaLocations())
+        {
+            AvailableLocations.Add(location);
+        }
+        
+        // Gehitu bereizlea (aukerakoa)
+        AvailableLocations.Add(new Location { Name = "??????????", Latitude = 0, Longitude = 0, IsPredefined = true });
+        
+        // Gehitu Espainiako gainerako kokapenak
+        foreach (var location in PredefinedLocations.GetSpainLocations())
+        {
+            AvailableLocations.Add(location);
+        }
+    }
+
+    private void ApplyLocation(Location location)
+    {
+        // Ez aplikatu bereizlea
+        if (location.Name == "??????????")
+        {
+            SelectedLocation = null;
+            return;
+        }
+
+        Settings.Latitude = location.Latitude;
+        Settings.Longitude = location.Longitude;
+        Settings.LocationName = location.Name;
+        
+        // Gehitu azkenekotzat baldin ez badaude aurrez definituta edo eguneratu badira
+        Settings.AddRecentLocation(new Location
+        {
+            Name = location.Name,
+            Latitude = location.Latitude,
+            Longitude = location.Longitude,
+            IsPredefined = false
+        });
+        
+        // Kokapenak eguneratu
+        InitializeAvailableLocations();
+        
+        // Eguraldiaren datuak eguneratu
+        _ = RefreshWeatherAsync();
+    }
+
+    public WeatherData? WeatherData
+    {
+        get => _weatherData;
+        set { _weatherData = value; OnPropertyChanged(); }
+    }
+
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set { _isLoading = value; OnPropertyChanged(); }
+    }
+
+    public string ErrorMessage
+    {
+        get => _errorMessage;
+        set { _errorMessage = value; OnPropertyChanged(); }
+    }
+
+    public bool UseCurrentLocation
+    {
+        get => _useCurrentLocation;
+        set
+        {
+            _useCurrentLocation = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string CurrentTemperature => WeatherData?.Current != null 
+        ? $"{Math.Round(WeatherData.Current.Temperature)}°C" 
+        : "--°C";
+
+    public string CurrentDescription => WeatherData?.Current?.Weather?.FirstOrDefault()?.Description ?? "Daturik ez";
+
+    public string WeatherIcon => WeatherData?.Current?.Weather?.FirstOrDefault()?.Icon != null
+        ? _weatherService.GetWeatherIcon(WeatherData.Current.Weather.First().Icon)
+        : "???";
+
+    public string BackgroundGradient => WeatherData?.Current?.Weather?.FirstOrDefault()?.Icon != null
+        ? _weatherService.GetWeatherBackground(WeatherData.Current.Weather.First().Icon)
+        : "#56CCF2, #2F80ED";
+
+    public string Humidity => WeatherData?.Current != null 
+        ? $"{WeatherData.Current.Humidity}%" 
+        : "--%";
+
+    public string WindSpeed => WeatherData?.Current != null 
+        ? $"{Math.Round(WeatherData.Current.WindSpeed)} km/h" 
+        : "-- km/h";
+
+    public string FeelsLike => WeatherData?.Current != null 
+        ? $"{Math.Round(WeatherData.Current.FeelsLike)}°C" 
+        : "--°C";
+
+    public async Task InitializeAsync()
+    {
+        await RefreshWeatherAsync();
+        _refreshTimer.Start();
+    }
+
+    public async Task RefreshWeatherAsync()
+    {
+        IsLoading = true;
+        ErrorMessage = string.Empty;
+
+        try
+        {
+            double latitude = Settings.Latitude;
+            double longitude = Settings.Longitude;
+
+            // Oraingo kokapena gaituta badago, lortu
+            if (UseCurrentLocation)
+            {
+                var location = await _locationService.GetCurrentLocationAsync();
+                if (location.HasValue)
+                {
+                    latitude = location.Value.Latitude;
+                    longitude = location.Value.Longitude;
+                    
+                    // Kokapenaren izena eguneratu
+                    Settings.LocationName = location.Value.LocationName;
+                }
+                else
+                {
+                    ErrorMessage = "Ezin izan da oraingo kokapena lortu. Konfiguratutako kokapena erabiltzen.";
+                    // Konfiguratutako koordenatuak erabili fallback gisa
+                }
+            }
+
+            WeatherData = await _weatherService.GetWeatherDataAsync(latitude, longitude);
+
+            if (WeatherData == null)
+            {
+                ErrorMessage = "Ezin izan dira eguraldiaren datuak lortu";
+            }
+            else
+            {
+                // Propietate kalkulatuen aldaketak jakinarazi
+                OnPropertyChanged(nameof(CurrentTemperature));
+                OnPropertyChanged(nameof(CurrentDescription));
+                OnPropertyChanged(nameof(WeatherIcon));
+                OnPropertyChanged(nameof(BackgroundGradient));
+                OnPropertyChanged(nameof(Humidity));
+                OnPropertyChanged(nameof(WindSpeed));
+                OnPropertyChanged(nameof(FeelsLike));
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Errorea: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    /// <summary>
+    /// Gailuaren oraingo kokapena lortu eta aplikatu
+    /// </summary>
+    public async Task<bool> UseMyLocationAsync()
+    {
+        IsLoading = true;
+        ErrorMessage = string.Empty;
+
+        try
+        {
+            var location = await _locationService.GetCurrentLocationAsync();
+            
+            if (location.HasValue)
+            {
+                Settings.Latitude = location.Value.Latitude;
+                Settings.Longitude = location.Value.Longitude;
+                Settings.LocationName = location.Value.LocationName;
+                
+                // Gehitu azkenekotzat
+                Settings.AddRecentLocation(new Location
+                {
+                    Name = location.Value.LocationName,
+                    Latitude = location.Value.Latitude,
+                    Longitude = location.Value.Longitude
+                });
+                
+                // Zerrenda eguneratu
+                InitializeAvailableLocations();
+                
+                UseCurrentLocation = true;
+                
+                // Eguraldiaren datuak kokapen berriarekin eguneratu
+                await RefreshWeatherAsync();
+                
+                return true;
+            }
+            else
+            {
+                ErrorMessage = "Ezin izan da zure kokapena lortu. Egiaztatu Windows-en kokapen-zerbitzua gaituta dagoela.";
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Errorea kokapena lortzean: {ex.Message}";
+            return false;
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    /// <summary>
+    /// Egiaztatu kokapen-zerbitzua erabilgarri dagoen
+    /// </summary>
+    public async Task<bool> CheckLocationAvailabilityAsync()
+    {
+        return await _locationService.IsLocationAvailableAsync();
+    }
+
+    private void UpdateRefreshInterval()
+    {
+        _refreshTimer.Interval = TimeSpan.FromMinutes(Settings.RefreshInterval);
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}

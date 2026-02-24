@@ -1,0 +1,43 @@
+﻿using System.Windows;
+using System.Windows.Input;
+using climaster.ViewModels;
+
+namespace climaster;
+
+public partial class WeatherWidget : Window
+{
+    private readonly WeatherViewModel _viewModel;
+
+    public WeatherWidget(WeatherViewModel viewModel)
+    {
+        InitializeComponent();
+        _viewModel = viewModel;
+        DataContext = _viewModel;
+
+        // Posicionar en la esquina inferior derecha
+        Left = SystemParameters.WorkArea.Right - Width - 20;
+        Top = SystemParameters.WorkArea.Bottom - Height - 20;
+    }
+
+    private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        // Permitir arrastrar la ventana
+        if (e.LeftButton == MouseButtonState.Pressed)
+        {
+            DragMove();
+        }
+    }
+
+    protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
+    {
+        base.OnMouseDoubleClick(e);
+        // Doble click para abrir la ventana de configuración
+        var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
+        if (mainWindow != null)
+        {
+            mainWindow.Show();
+            mainWindow.WindowState = WindowState.Normal;
+            mainWindow.Activate();
+        }
+    }
+}

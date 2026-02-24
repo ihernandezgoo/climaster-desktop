@@ -1,0 +1,95 @@
+﻿using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using climaster.ViewModels;
+
+namespace climaster
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        private readonly WeatherViewModel _viewModel;
+        private WeatherWidget? _widget;
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            
+            _viewModel = new WeatherViewModel();
+            DataContext = _viewModel;
+
+            Loaded += MainWindow_Loaded;
+        }
+
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Inicializar el ViewModel
+            await _viewModel.InitializeAsync();
+
+            // Crear y mostrar el widget
+            ShowWidget();
+
+            // Ocultar la ventana principal (no minimizar)
+            Hide();
+        }
+
+        private void ShowWidget()
+        {
+            if (_widget == null || !_widget.IsLoaded)
+            {
+                _widget = new WeatherWidget(_viewModel);
+                _widget.Show();
+            }
+        }
+
+        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            await _viewModel.RefreshWeatherAsync();
+        }
+
+        private void HideButton_Click(object sender, RoutedEventArgs e)
+        {
+            Hide();
+        }
+
+        private void ShowConfig_Click(object sender, RoutedEventArgs e)
+        {
+            Show();
+            WindowState = WindowState.Normal;
+            Activate();
+        }
+
+        private void TrayIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
+        {
+            ShowConfig_Click(sender, e);
+        }
+
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            // Dispose del icono de bandeja
+            TrayIcon?.Dispose();
+            
+            // Cerrar el widget
+            _widget?.Close();
+            
+            // Cerrar la aplicación
+            Application.Current.Shutdown();
+        }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            // En lugar de cerrar, ocultar
+            e.Cancel = true;
+            Hide();
+        }
+    }
+}

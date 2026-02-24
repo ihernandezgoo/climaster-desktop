@@ -1,0 +1,256 @@
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Effects;
+using System.Windows.Shapes;
+using climaster.Converters;
+using climaster.ViewModels;
+
+namespace climaster;
+
+public class WeatherWidget : Window
+{
+    private readonly WeatherViewModel _viewModel;
+
+    public WeatherWidget(WeatherViewModel viewModel)
+    {
+        _viewModel = viewModel;
+        DataContext = _viewModel;
+
+        // Leihoaren konfigurazioa
+        Title = "Eguraldiaren Widget-a";
+        Width = 320;
+        Height = 420;
+        WindowStyle = WindowStyle.None;
+        AllowsTransparency = true;
+        Background = Brushes.Transparent;
+        Topmost = false; // false-ra aldatuta beste leihoen atzean egoteko
+        ResizeMode = ResizeMode.NoResize;
+        ShowInTaskbar = false;
+
+        // UI sortu
+        Content = CreateWidgetUI();
+
+        // Beheko eskuineko izkinan kokatu
+        Left = SystemParameters.WorkArea.Right - Width - 20;
+        Top = SystemParameters.WorkArea.Bottom - Height - 20;
+
+        // Arrastatzea baimendu
+        MouseLeftButtonDown += (s, e) =>
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+                DragMove();
+        };
+
+        // Klik bikoitza konfigurazioa irekitzeko
+        MouseDoubleClick += (s, e) =>
+        {
+            var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
+            if (mainWindow != null)
+            {
+                mainWindow.Show();
+                mainWindow.WindowState = WindowState.Normal;
+                mainWindow.Activate();
+            }
+        };
+
+        // Widget-a hondora bidali erakusten denean
+        Loaded += (s, e) => SendToBottom();
+    }
+
+    private void SendToBottom()
+    {
+        // Interop erabili leihoa hondora bidaltzeko
+        var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+        SetWindowPos(hwnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    }
+
+    // SetWindowPos-erako P/Invoke
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+    private static readonly IntPtr HWND_BOTTOM = new IntPtr(1);
+    private const uint SWP_NOSIZE = 0x0001;
+    private const uint SWP_NOMOVE = 0x0002;
+    private const uint SWP_NOACTIVATE = 0x0010;
+
+    private Border CreateWidgetUI()
+    {
+        var mainBorder = new Border
+        {
+            CornerRadius = new CornerRadius(20),
+            Margin = new Thickness(10),
+            Background = new LinearGradientBrush
+            {
+                StartPoint = new Point(0, 0),
+                EndPoint = new Point(0, 1),
+                GradientStops = new GradientStopCollection
+                {
+                    new GradientStop((Color)ColorConverter.ConvertFromString("#2C3E50"), 0),
+                    new GradientStop((Color)ColorConverter.ConvertFromString("#34495E"), 1)
+                }
+            },
+            Effect = new DropShadowEffect
+            {
+                BlurRadius = 30,
+                ShadowDepth = 10,
+                Opacity = 0.4,
+                Color = Colors.Black
+            }
+        };
+
+        // Opakutasunaren lotura
+        var opacityBinding = new Binding("Settings.WidgetOpacity") { Source = _viewModel };
+        mainBorder.SetBinding(Border.OpacityProperty, opacityBinding);
+
+        // Eduki nagusia
+        var mainGrid = new Grid { Margin = new Thickness(20) };
+        mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+        // Goiburua
+        mainGrid.Children.Add(CreateHeader());
+        Grid.SetRow((UIElement)mainGrid.Children[0], 0);
+
+        // Eguraldiaren Erakustaldi Nagusia
+        mainGrid.Children.Add(CreateMainWeatherDisplay());
+        Grid.SetRow((UIElement)mainGrid.Children[1], 1);
+
+        // Eguraldiaren Xehetasunak
+        mainGrid.Children.Add(CreateWeatherDetails());
+        Grid.SetRow((UIElement)mainGrid.Children[2], 2);
+
+        mainBorder.Child = mainGrid;
+        return mainBorder;
+    }
+
+    private StackPanel CreateHeader()
+    {
+        var header = new StackPanel { Margin = new Thickness(0, 0, 0, 20) };
+
+        var locationText = new TextBlock
+        {
+            FontSize = 18,
+            FontWeight = FontWeights.SemiBold,
+            Foreground = Brushes.White,
+            HorizontalAlignment = HorizontalAlignment.Center
+        };
+        locationText.SetBinding(TextBlock.TextProperty, new Binding("Settings.LocationName") { Source = _viewModel });
+
+        var descriptionText = new TextBlock
+        {
+            FontSize = 12,
+            Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E0E0E0")),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Margin = new Thickness(0, 4, 0, 0)
+        };
+        descriptionText.SetBinding(TextBlock.TextProperty, new Binding("CurrentDescription") { Source = _viewModel });
+
+        header.Children.Add(locationText);
+        header.Children.Add(descriptionText);
+
+        return header;
+    }
+
+    private StackPanel CreateMainWeatherDisplay()
+    {
+        var mainDisplay = new StackPanel
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+
+        var iconText = new TextBlock
+        {
+            FontSize = 80,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Margin = new Thickness(0, 0, 0, 10)
+        };
+        iconText.SetBinding(TextBlock.TextProperty, new Binding("WeatherIcon") { Source = _viewModel });
+
+        var tempText = new TextBlock
+        {
+            FontSize = 60,
+            FontWeight = FontWeights.Bold,
+            Foreground = Brushes.White,
+            HorizontalAlignment = HorizontalAlignment.Center
+        };
+        tempText.SetBinding(TextBlock.TextProperty, new Binding("CurrentTemperature") { Source = _viewModel });
+
+        var descText = new TextBlock
+        {
+            FontSize = 16,
+            Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E0E0E0")),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Margin = new Thickness(0, 5, 0, 0)
+        };
+        descText.SetBinding(TextBlock.TextProperty, new Binding("CurrentDescription") { Source = _viewModel });
+
+        mainDisplay.Children.Add(iconText);
+        mainDisplay.Children.Add(tempText);
+        mainDisplay.Children.Add(descText);
+
+        return mainDisplay;
+    }
+
+    private Grid CreateWeatherDetails()
+    {
+        var detailsGrid = new Grid { Margin = new Thickness(0, 20, 0, 0) };
+        detailsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        detailsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        detailsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+        // Sentsazioa
+        var feelsLikePanel = CreateDetailPanel("???", "Sentsazioa", "FeelsLike");
+        detailsGrid.Children.Add(feelsLikePanel);
+        Grid.SetColumn(feelsLikePanel, 0);
+
+        // Hezetasuna
+        var humidityPanel = CreateDetailPanel("??", "Hezetasuna", "Humidity");
+        detailsGrid.Children.Add(humidityPanel);
+        Grid.SetColumn(humidityPanel, 1);
+
+        // Haizea
+        var windPanel = CreateDetailPanel("??", "Haizea", "WindSpeed");
+        detailsGrid.Children.Add(windPanel);
+        Grid.SetColumn(windPanel, 2);
+
+        return detailsGrid;
+    }
+
+    private StackPanel CreateDetailPanel(string icon, string label, string bindingPath)
+    {
+        var panel = new StackPanel { HorizontalAlignment = HorizontalAlignment.Center };
+
+        panel.Children.Add(new TextBlock
+        {
+            Text = icon,
+            FontSize = 24,
+            HorizontalAlignment = HorizontalAlignment.Center
+        });
+
+        panel.Children.Add(new TextBlock
+        {
+            Text = label,
+            FontSize = 10,
+            Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#B0B0B0")),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Margin = new Thickness(0, 4, 0, 2)
+        });
+
+        var valueText = new TextBlock
+        {
+            FontSize = 14,
+            FontWeight = FontWeights.SemiBold,
+            Foreground = Brushes.White,
+            HorizontalAlignment = HorizontalAlignment.Center
+        };
+        valueText.SetBinding(TextBlock.TextProperty, new Binding(bindingPath) { Source = _viewModel });
+        panel.Children.Add(valueText);
+
+        return panel;
+    }
+}

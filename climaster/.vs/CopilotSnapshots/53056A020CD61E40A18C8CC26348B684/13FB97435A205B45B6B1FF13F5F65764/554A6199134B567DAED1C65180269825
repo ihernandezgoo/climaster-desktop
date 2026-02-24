@@ -1,0 +1,138 @@
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Threading;
+using climaster.Models;
+using climaster.Services;
+
+namespace climaster.ViewModels;
+
+public class WeatherViewModel : INotifyPropertyChanged
+{
+    private readonly WeatherService _weatherService;
+    private readonly DispatcherTimer _refreshTimer;
+    private WeatherData? _weatherData;
+    private bool _isLoading;
+    private string _errorMessage = string.Empty;
+
+    public WeatherViewModel()
+    {
+        _weatherService = new WeatherService();
+        
+        // Cargar configuración guardada o usar la predeterminada
+        Settings = SettingsManager.LoadSettings() ?? new WidgetSettings();
+        
+        _refreshTimer = new DispatcherTimer();
+        _refreshTimer.Tick += async (s, e) => await RefreshWeatherAsync();
+        UpdateRefreshInterval();
+
+        Settings.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(WidgetSettings.RefreshInterval))
+                UpdateRefreshInterval();
+            
+            // Guardar configuración cuando cambie
+            SettingsManager.SaveSettings(Settings);
+        };
+    }
+
+    public WidgetSettings Settings { get; }
+
+    public WeatherData? WeatherData
+    {
+        get => _weatherData;
+        set { _weatherData = value; OnPropertyChanged(); }
+    }
+
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set { _isLoading = value; OnPropertyChanged(); }
+    }
+
+    public string ErrorMessage
+    {
+        get => _errorMessage;
+        set { _errorMessage = value; OnPropertyChanged(); }
+    }
+
+    public string CurrentTemperature => WeatherData?.Current != null 
+        ? $"{Math.Round(WeatherData.Current.Temperature)}°C" 
+        : "--°C";
+
+    public string CurrentDescription => WeatherData?.Current?.Weather?.FirstOrDefault()?.Description ?? "Sin datos";
+
+    public string WeatherIcon => WeatherData?.Current?.Weather?.FirstOrDefault()?.Icon != null
+        ? _weatherService.GetWeatherIcon(WeatherData.Current.Weather.First().Icon)
+        : "???";
+
+    public string BackgroundGradient => WeatherData?.Current?.Weather?.FirstOrDefault()?.Icon != null
+        ? _weatherService.GetWeatherBackground(WeatherData.Current.Weather.First().Icon)
+        : "#56CCF2, #2F80ED";
+
+    public string Humidity => WeatherData?.Current != null 
+        ? $"{WeatherData.Current.Humidity}%" 
+        : "--%";
+
+    public string WindSpeed => WeatherData?.Current != null 
+        ? $"{Math.Round(WeatherData.Current.WindSpeed)} km/h" 
+        : "-- km/h";
+
+    public string FeelsLike => WeatherData?.Current != null 
+        ? $"{Math.Round(WeatherData.Current.FeelsLike)}°C" 
+        : "--°C";
+
+    public async Task InitializeAsync()
+    {
+        await RefreshWeatherAsync();
+        _refreshTimer.Start();
+    }
+
+    public async Task RefreshWeatherAsync()
+    {
+        IsLoading = true;
+        ErrorMessage = string.Empty;
+
+        try
+        {
+            WeatherData = await _weatherService.GetWeatherDataAsync(
+                Settings.Latitude, 
+                Settings.Longitude);
+
+            if (WeatherData == null)
+            {
+                ErrorMessage = "No se pudo obtener los datos del tiempo";
+            }
+            else
+            {
+                // Notificar cambios en todas las propiedades calculadas
+                OnPropertyChanged(nameof(CurrentTemperature));
+                OnPropertyChanged(nameof(CurrentDescription));
+                OnPropertyChanged(nameof(WeatherIcon));
+                OnPropertyChanged(nameof(BackgroundGradient));
+                OnPropertyChanged(nameof(Humidity));
+                OnPropertyChanged(nameof(WindSpeed));
+                OnPropertyChanged(nameof(FeelsLike));
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private void UpdateRefreshInterval()
+    {
+        _refreshTimer.Interval = TimeSpan.FromMinutes(Settings.RefreshInterval);
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}

@@ -1,0 +1,70 @@
+﻿using System.Net.Http;
+using System.Net.Http.Json;
+using climaster.Models;
+
+namespace climaster.Services;
+
+public class WeatherService
+{
+    private readonly HttpClient _httpClient;
+    private const string API_KEY = "51e154b61c72032ef18f3b7eea32a959";
+    private const string BASE_URL = "https://api.openweathermap.org/data/3.0/onecall";
+
+    public WeatherService()
+    {
+        _httpClient = new HttpClient();
+    }
+
+    public async Task<WeatherData?> GetWeatherDataAsync(double latitude, double longitude)
+    {
+        try
+        {
+            var url = $"{BASE_URL}?lat={latitude}&lon={longitude}&appid={API_KEY}&units=metric&lang=eu";
+            var response = await _httpClient.GetFromJsonAsync<WeatherData>(url);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Errorea eguraldiaren datuak lortzean: {ex.Message}");
+            return null;
+        }
+    }
+
+    public string GetWeatherIcon(string iconCode)
+    {
+        // OpenWeatherMap ikonoen mapeoa emoji/ikurretara
+        return iconCode switch
+        {
+            "01d" => "☀️",  // Zeru garbia egunez
+            "01n" => "🌙",  // Zeru garbia gauez
+            "02d" => "⛅",  // Hodei gutxi egunez
+            "02n" => "☁️",  // Hodei gutxi gauez
+            "03d" or "03n" => "☁️",  // Hodei sakabanatua
+            "04d" or "04n" => "☁️",  // Hodei haustuak
+            "09d" or "09n" => "🌧️",  // Euri jasa
+            "10d" => "🌦️",  // Euria egunez
+            "10n" => "🌧️",  // Euria gauez
+            "11d" or "11n" => "⛈️",  // Ekaitza
+            "13d" or "13n" => "❄️",  // Elurra
+            "50d" or "50n" => "🌫️",  // Lainoa
+            _ => "🌤️"
+        };
+    }
+
+    public string GetWeatherBackground(string iconCode)
+    {
+        // Eguraldiaren baldintza desberdinetarako gradienteak
+        return iconCode switch
+        {
+            "01d" => "#FFB75E, #ED8F03",  // Eguzkitsua
+            "01n" => "#2C5364, #203A43, #0F2027",  // Gau garbia
+            "02d" or "03d" or "04d" => "#89CFF0, #4A90E2",  // Lainotua
+            "02n" or "03n" or "04n" => "#434343, #000000",  // Lainopean gaua
+            "09d" or "09n" or "10d" or "10n" => "#536976, #292E49",  // Euria
+            "11d" or "11n" => "#141E30, #243B55",  // Ekaitza
+            "13d" or "13n" => "#E6DADA, #274046",  // Elurra
+            "50d" or "50n" => "#606c88, #3f4c6b",  // Lainoa
+            _ => "#56CCF2, #2F80ED"
+        };
+    }
+}

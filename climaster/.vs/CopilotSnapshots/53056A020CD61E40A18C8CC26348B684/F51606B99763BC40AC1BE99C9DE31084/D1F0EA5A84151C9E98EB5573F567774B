@@ -1,0 +1,19 @@
+﻿using System.Windows;
+using climaster.ViewModels;
+
+namespace climaster;
+
+/// <summary>
+/// Eguraldiaren informazio zehatza erakusten duen leihoa
+/// </summary>
+public partial class WeatherInfoWindow : Window
+{
+    private readonly WeatherViewModel _viewModel;
+
+    public WeatherInfoWindow(WeatherViewModel viewModel)
+    {
+        InitializeComponent();
+        _viewModel = viewModel;
+        DataContext = _viewModel;
+    }
+}

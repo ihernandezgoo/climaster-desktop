@@ -1,0 +1,121 @@
+﻿# ☁️ CliMaster - Widget del Tiempo para Windows
+
+Una aplicación moderna del tiempo con widget flotante personalizable para Windows, desarrollada en WPF puro (C# + XAML).
+
+## ✨ Características
+
+### 🎯 Widget Flotante
+- **Ventana sin bordes y transparente**
+- **Solo visible en el escritorio** (no interfiere con otras ventanas)
+- **Arrastrable** - Mueve el widget donde quieras
+- **Diseño moderno estilo Windows 11**
+- **Animaciones suaves**
+
+### 📍 **NUEVO: Geolocalización Automática**
+- **Detecta tu ubicación automáticamente** por IP
+- **Botón "Usar Mi Ubicación Actual"** - Un click y listo
+- **Modo automático** - Actualiza tu ubicación en cada refresh
+- **Sin permisos GPS** - Funciona con tu IP pública
+- **Privado y seguro** - Sin tracking, solo APIs públicas
+
+### 📊 Información del Tiempo
+- Temperatura actual
+- Descripción del clima
+- Sensación térmica
+- Humedad
+- Velocidad del viento
+- Iconos dinámicos según el clima
+- Pronóstico por horas (opcional)
+
+### ⚙️ Personalización
+- **Ubicación automática o manual**: Elige entre detectar automáticamente o configurar coordenadas
+- **Opacidad**: Ajusta la transparencia del widget (30% - 100%)
+- **Tamaño**: Escala el widget (50% - 150%)
+- **Intervalo de actualización**: Define cada cuántos minutos se actualiza
+- **Opciones de visualización**: Activa/desactiva pronósticos
+
+### 🖥️ Ejecución en Segundo Plano
+- **Icono en bandeja del sistema** (System Tray)
+- **Menú contextual** con acciones rápidas
+- **Ventana principal oculta** - No molesta en la barra de tareas
+- **Widget solo en escritorio** - Se oculta automáticamente con otras ventanas
+
+## 🔑 API del Tiempo
+
+La aplicación utiliza la API de OpenWeatherMap (OneCall API 3.0).
+
+**API Key incluida**: `51e154b61c72032ef18f3b7eea32a959`
+
+### Endpoint
+```
+https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_KEY}&units=metric&lang=es
+```
+
+## 🚀 Cómo Usar
+
+### Requisitos
+- Windows 10/11
+- .NET 8.0 Runtime
+- Conexión a Internet (para ubicación automática y datos del tiempo)
+
+### Instalación y Ejecución
+
+1. **Clonar el repositorio**:
+```bash
+git clone https://github.com/ihernandezgoo/climaster-desktop.git
+cd climaster-desktop/climaster
+```
+
+2. **Compilar y ejecutar**:
+```bash
+dotnet run
+```
+
+O abrir la solución en Visual Studio 2022 y presionar F5.
+
+### Uso de la Aplicación
+
+1. **Al iniciar**:
+   - La aplicación se ejecuta en segundo plano
+   - El widget aparece en el escritorio (esquina inferior derecha)
+   - Un icono aparece en la bandeja del sistema
+
+2. **Configurar Ubicación** (3 opciones):
+   
+   **A. Ubicación Automática (Recomendado):**
+   - Doble click en el widget o icono de bandeja
+   - Click en **"📍 Usar Mi Ubicación Actual"**
+   - ¡Listo! Se detecta tu ciudad automáticamente
+   
+   **B. Modo Automático Continuo:**
+   - Activa el checkbox **"Usar ubicación actual automáticamente"**
+   - Se actualizará tu ubicación en cada refresh
+   - Perfecto si viajas o usas portátil
+   
+   **C. Configuración Manual:**
+   - Introduce manualmente latitud y longitud
+   - Máxima precisión
+
+3. **Interacción con el Widget**:
+   - **Click izquierdo + arrastrar**: Mover el widget
+   - **Doble click**: Abrir ventana de configuración
+   - El widget se **esconde automáticamente** con otras ventanas
+
+4. **Menú de Bandeja del Sistema**:
+   - **Click derecho** en el icono → Menú contextual
+   - **Doble click** → Abrir configuración
+   - **Tooltip** → Ver temperatura actual
+
+## 📍 Ubicaciones de Ejemplo
+
+| Ciudad | Latitud | Longitud |
+|--------|---------|----------|
+| San Sebastián | 43.31 | -1.98 |
+| Madrid | 40.42 | -3.70 |
+| Barcelona | 41.39 | 2.16 |
+| Valencia | 39.47 | -0.38 |
+| Sevilla | 37.39 | -5.98 |
+
+O simplemente usa **"Usar Mi Ubicación Actual"** 🎯
+
+## ...existing code...
