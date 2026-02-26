@@ -7,40 +7,24 @@
       "RelativeMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|solutionrelative:climaster\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|d:\\climaster-desktop\\climaster\\climaster\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|solutionrelative:climaster\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|d:\\climaster-desktop\\climaster\\climaster\\viewmodels\\weatherviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|solutionrelative:climaster\\viewmodels\\weatherviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|d:\\climaster-desktop\\climaster\\climaster\\services\\weatherservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|solutionrelative:climaster\\services\\weatherservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|d:\\climaster-desktop\\climaster\\climaster\\services\\locationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|solutionrelative:climaster\\services\\locationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|d:\\climaster-desktop\\climaster\\climaster\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|solutionrelative:climaster\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|d:\\climaster-desktop\\climaster\\climaster\\models\\widgetsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|solutionrelative:climaster\\models\\widgetsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|d:\\climaster-desktop\\climaster\\climaster\\models\\weatherdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|solutionrelative:climaster\\models\\weatherdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|d:\\climaster-desktop\\climaster\\climaster\\models\\settingsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|solutionrelative:climaster\\models\\settingsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|d:\\climaster-desktop\\climaster\\climaster\\models\\location.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|solutionrelative:climaster\\models\\location.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|d:\\climaster-desktop\\climaster\\climaster\\converters\\valueconverters.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|solutionrelative:climaster\\converters\\valueconverters.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|d:\\climaster-desktop\\climaster\\climaster\\weatherwidget.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|solutionrelative:climaster\\weatherwidget.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|d:\\climaster-desktop\\climaster\\climaster\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B3D0BC2B-0E43-46C0-A95E-20A64417B24C}|climaster\\climaster.csproj|solutionrelative:climaster\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -50,8 +34,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "D:\\climaster-desktop\\climaster\\climaster\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "climaster\\MainWindow.xaml.cs",
+              "ToolTip": "D:\\climaster-desktop\\climaster\\climaster\\MainWindow.xaml.cs",
+              "RelativeToolTip": "climaster\\MainWindow.xaml.cs",
+              "ViewState": "AgIAAOkAAAAAAAAAAABRwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-26T10:23:03.704Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -61,124 +58,58 @@
               "ToolTip": "D:\\climaster-desktop\\climaster\\climaster\\MainWindow.xaml",
               "RelativeToolTip": "climaster\\MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-02-24T10:14:32.706Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "MainWindow.xaml.cs",
-              "DocumentMoniker": "D:\\climaster-desktop\\climaster\\climaster\\MainWindow.xaml.cs",
-              "RelativeDocumentMoniker": "climaster\\MainWindow.xaml.cs",
-              "ToolTip": "D:\\climaster-desktop\\climaster\\climaster\\MainWindow.xaml.cs",
-              "RelativeToolTip": "climaster\\MainWindow.xaml.cs",
-              "ViewState": "AgIAAH8AAAAAAAAAAAAYwJIAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-24T10:14:31.768Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "WeatherViewModel.cs",
-              "DocumentMoniker": "D:\\climaster-desktop\\climaster\\climaster\\ViewModels\\WeatherViewModel.cs",
-              "RelativeDocumentMoniker": "climaster\\ViewModels\\WeatherViewModel.cs",
-              "ToolTip": "D:\\climaster-desktop\\climaster\\climaster\\ViewModels\\WeatherViewModel.cs",
-              "RelativeToolTip": "climaster\\ViewModels\\WeatherViewModel.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAABKAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-24T10:14:28.195Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "WeatherService.cs",
-              "DocumentMoniker": "D:\\climaster-desktop\\climaster\\climaster\\Services\\WeatherService.cs",
-              "RelativeDocumentMoniker": "climaster\\Services\\WeatherService.cs",
-              "ToolTip": "D:\\climaster-desktop\\climaster\\climaster\\Services\\WeatherService.cs",
-              "RelativeToolTip": "climaster\\Services\\WeatherService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAABIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-24T10:14:26.225Z",
+              "WhenOpened": "2026-02-26T10:17:37.973Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "LocationService.cs",
-              "DocumentMoniker": "D:\\climaster-desktop\\climaster\\climaster\\Services\\LocationService.cs",
-              "RelativeDocumentMoniker": "climaster\\Services\\LocationService.cs",
-              "ToolTip": "D:\\climaster-desktop\\climaster\\climaster\\Services\\LocationService.cs",
-              "RelativeToolTip": "climaster\\Services\\LocationService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAABEAAAAAAAAAA==",
+              "Title": "WeatherWidget.cs",
+              "DocumentMoniker": "D:\\climaster-desktop\\climaster\\climaster\\WeatherWidget.cs",
+              "RelativeDocumentMoniker": "climaster\\WeatherWidget.cs",
+              "ToolTip": "D:\\climaster-desktop\\climaster\\climaster\\WeatherWidget.cs",
+              "RelativeToolTip": "climaster\\WeatherWidget.cs",
+              "ViewState": "AgIAADsCAAAAAAAAAMBcwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-24T10:14:24.085Z",
+              "WhenOpened": "2026-02-26T10:15:42.356Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "WidgetSettings.cs",
-              "DocumentMoniker": "D:\\climaster-desktop\\climaster\\climaster\\Models\\WidgetSettings.cs",
-              "RelativeDocumentMoniker": "climaster\\Models\\WidgetSettings.cs",
-              "ToolTip": "D:\\climaster-desktop\\climaster\\climaster\\Models\\WidgetSettings.cs",
-              "RelativeToolTip": "climaster\\Models\\WidgetSettings.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-24T10:14:20.964Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "WeatherData.cs",
-              "DocumentMoniker": "D:\\climaster-desktop\\climaster\\climaster\\Models\\WeatherData.cs",
-              "RelativeDocumentMoniker": "climaster\\Models\\WeatherData.cs",
-              "ToolTip": "D:\\climaster-desktop\\climaster\\climaster\\Models\\WeatherData.cs",
-              "RelativeToolTip": "climaster\\Models\\WeatherData.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-24T10:14:18.466Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "SettingsManager.cs",
-              "DocumentMoniker": "D:\\climaster-desktop\\climaster\\climaster\\Models\\SettingsManager.cs",
-              "RelativeDocumentMoniker": "climaster\\Models\\SettingsManager.cs",
-              "ToolTip": "D:\\climaster-desktop\\climaster\\climaster\\Models\\SettingsManager.cs",
-              "RelativeToolTip": "climaster\\Models\\SettingsManager.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAOAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-24T10:14:16.394Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "Location.cs",
-              "DocumentMoniker": "D:\\climaster-desktop\\climaster\\climaster\\Models\\Location.cs",
-              "RelativeDocumentMoniker": "climaster\\Models\\Location.cs",
-              "ToolTip": "D:\\climaster-desktop\\climaster\\climaster\\Models\\Location.cs",
-              "RelativeToolTip": "climaster\\Models\\Location.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-24T10:14:13.876Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 3,
               "Title": "ValueConverters.cs",
               "DocumentMoniker": "D:\\climaster-desktop\\climaster\\climaster\\Converters\\ValueConverters.cs",
               "RelativeDocumentMoniker": "climaster\\Converters\\ValueConverters.cs",
               "ToolTip": "D:\\climaster-desktop\\climaster\\climaster\\Converters\\ValueConverters.cs",
               "RelativeToolTip": "climaster\\Converters\\ValueConverters.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAQAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-24T10:14:09.849Z",
+              "WhenOpened": "2026-02-26T10:15:34.779Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "WidgetSettings.cs",
+              "DocumentMoniker": "D:\\climaster-desktop\\climaster\\climaster\\Models\\WidgetSettings.cs",
+              "RelativeDocumentMoniker": "climaster\\Models\\WidgetSettings.cs",
+              "ToolTip": "D:\\climaster-desktop\\climaster\\climaster\\Models\\WidgetSettings.cs",
+              "RelativeToolTip": "climaster\\Models\\WidgetSettings.cs",
+              "ViewState": "AgIAAB4BAAAAAAAAAABRwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-26T10:15:34.749Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "App.xaml",
+              "DocumentMoniker": "D:\\climaster-desktop\\climaster\\climaster\\App.xaml",
+              "RelativeDocumentMoniker": "climaster\\App.xaml",
+              "ToolTip": "D:\\climaster-desktop\\climaster\\climaster\\App.xaml",
+              "RelativeToolTip": "climaster\\App.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-26T10:15:15.883Z",
               "EditorCaption": ""
             }
           ]

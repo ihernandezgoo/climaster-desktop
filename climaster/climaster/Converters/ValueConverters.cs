@@ -35,6 +35,58 @@ public class GradientStringToBrushConverter : IValueConverter
     }
 }
 
+// String de color a SolidColorBrush
+public class StringToColorBrushConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is string colorString && !string.IsNullOrEmpty(colorString))
+        {
+            try
+            {
+                var color = (Color)ColorConverter.ConvertFromString(colorString);
+                return new SolidColorBrush(color);
+            }
+            catch
+            {
+                return new SolidColorBrush(Colors.White);
+            }
+        }
+        return new SolidColorBrush(Colors.White);
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is SolidColorBrush brush)
+        {
+            return brush.Color.ToString();
+        }
+        return "#FFFFFF";
+    }
+}
+
+// Converter para visibilidad basado en bool
+public class BoolToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is bool boolValue)
+        {
+            return boolValue ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+        }
+        return System.Windows.Visibility.Collapsed;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is System.Windows.Visibility visibility)
+        {
+            return visibility == System.Windows.Visibility.Visible;
+        }
+        return false;
+    }
+}
+
 // Unix timestamp-a data eta ordu formatuera bihurtzen du
 public class UnixTimestampToDateTimeConverter : IValueConverter
 {
@@ -47,24 +99,6 @@ public class UnixTimestampToDateTimeConverter : IValueConverter
             return dateTime.ToString(format);
         }
         return string.Empty;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-// Boolean balioa Visibility-ra bihurtzen du
-public class BooleanToVisibilityConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        if (value is bool boolValue)
-        {
-            return boolValue ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
-        }
-        return System.Windows.Visibility.Collapsed;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -126,22 +160,22 @@ public class WeatherIconConverter : IValueConverter
         {
             return iconCode switch
             {
-                "01d" => "??",  // Zeru garbia egunez
+                "01d" => "?",  // Zeru garbia egunez
                 "01n" => "??",  // Zeru garbia gauez
                 "02d" => "?",  // Hodei gutxi egunez
                 "02n" => "??",  // Hodei gutxi gauez
-                "03d" or "03n" => "??",  // Hodei sakabanatua
+                "03d" or "03n" => "?",  // Hodei sakabanatua
                 "04d" or "04n" => "??",  // Hodei haustuak
-                "09d" or "09n" => "???",  // Euri jasa
-                "10d" => "???",  // Euria egunez
-                "10n" => "???",  // Euria gauez
-                "11d" or "11n" => "??",  // Ekaitza
-                "13d" or "13n" => "??",  // Elurra
-                "50d" or "50n" => "???",  // Lainoa
-                _ => "???"
+                "09d" or "09n" => "??",  // Euri jasa
+                "10d" => "??",  // Euria egunez
+                "10n" => "??",  // Euria gauez
+                "11d" or "11n" => "?",  // Ekaitza
+                "13d" or "13n" => "?",  // Elurra
+                "50d" or "50n" => "??",  // Lainoa
+                _ => "??"
             };
         }
-        return "???";
+        return "??";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

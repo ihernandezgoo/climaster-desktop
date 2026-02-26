@@ -168,7 +168,7 @@ public class WeatherViewModel : INotifyPropertyChanged
 
     public string WeatherIcon => WeatherData?.Current?.Weather?.FirstOrDefault()?.Icon != null
         ? _weatherService.GetWeatherIcon(WeatherData.Current.Weather.First().Icon)
-        : "???";
+        : "?";
 
     public string BackgroundGradient => WeatherData?.Current?.Weather?.FirstOrDefault()?.Icon != null
         ? _weatherService.GetWeatherBackground(WeatherData.Current.Weather.First().Icon)

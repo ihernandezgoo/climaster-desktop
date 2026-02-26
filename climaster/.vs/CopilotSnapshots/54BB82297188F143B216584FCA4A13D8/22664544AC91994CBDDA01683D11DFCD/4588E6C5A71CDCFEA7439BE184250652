@@ -1,0 +1,461 @@
+﻿<Window x:Class="climaster.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:climaster"
+        xmlns:tb="http://www.hardcodet.net/taskbar"
+        mc:Ignorable="d"
+        Title="CliMaster - Widget-aren Konfigurazioa" 
+        Height="850" Width="540"
+        WindowStartupLocation="CenterScreen"
+        Background="#F0F4F8"
+        ResizeMode="CanResize"
+        ShowInTaskbar="False"
+        Visibility="Collapsed"
+        FontFamily="Segoe UI, Tahoma, Geneva, Verdana, sans-serif">
+
+    <Window.Resources>
+        <LinearGradientBrush x:Key="WeatherGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#1A2980" Offset="0.0"/>
+            <GradientStop Color="#26D0CE" Offset="1.0"/>
+        </LinearGradientBrush>
+        <DropShadowEffect x:Key="SoftShadow" BlurRadius="15" ShadowDepth="4" Opacity="0.08" Color="#000000"/>
+
+        <ContextMenu x:Key="TrayMenu" Padding="5">
+            <MenuItem Header="⚙️ Konfigurazioa Erakutsi" Click="ShowConfig_Click" Padding="10,5"/>
+            <MenuItem Header="🔄 Orain Eguneratu" Click="RefreshButton_Click" Padding="10,5"/>
+            <Separator Margin="0,5"/>
+            <MenuItem Header="❌ Irten" Click="Exit_Click" Padding="10,5"/>
+        </ContextMenu>
+    </Window.Resources>
+
+    <Grid>
+        <tb:TaskbarIcon x:Name="TrayIcon"
+                        IconSource="pack://application:,,,/icon.ico"
+                        ToolTipText="CliMaster - Eguraldiaren Widget-a"
+                        ContextMenu="{StaticResource TrayMenu}"
+                        Visibility="Visible">
+        </tb:TaskbarIcon>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Background="{StaticResource WeatherGradient}" Padding="20,25,20,25">
+                <StackPanel>
+                    <TextBlock Text="⛅ CliMaster" FontSize="32" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                    <TextBlock Text="Eguraldiaren aplikazio eta widget-aren konfigurazioa" FontSize="13" Foreground="#E0F7FA" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- TabControl para separar el clima y la configuración -->
+            <TabControl Grid.Row="1" 
+                        BorderThickness="0" 
+                        Background="Transparent"
+                        Margin="0">
+                <TabControl.Resources>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Border Name="Border" 
+                                            Background="Transparent" 
+                                            BorderThickness="0" 
+                                            Padding="25,12"
+                                            Margin="0,0,2,0"
+                                            CornerRadius="8,8,0,0">
+                                        <ContentPresenter x:Name="ContentSite"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Center"
+                                                        ContentSource="Header"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Border" Property="Background" Value="White"/>
+                                            <Setter Property="Foreground" Value="#2C3E50"/>
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="False">
+                                            <Setter TargetName="Border" Property="Background" Value="#E5E7EB"/>
+                                            <Setter Property="Foreground" Value="#6B7280"/>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Border" Property="Background" Value="#F3F4F6"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="FontSize" Value="15"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                    </Style>
+                </TabControl.Resources>
+
+                <!-- PESTAÑA 1: INFORMACIÓN DEL TIEMPO -->
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🌤️" FontSize="18" Margin="0,0,8,0"/>
+                            <TextBlock Text="Eguraldia" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="#F0F4F8">
+                        <StackPanel Padding="20">
+                            <!-- Información del Tiempo Actual -->
+                            <Border Background="White" CornerRadius="12" Padding="20" Margin="0,0,0,20" Effect="{StaticResource SoftShadow}">
+                                <StackPanel>
+                                    <!-- Tarjeta principal del clima -->
+                                    <Border Background="{StaticResource WeatherGradient}" 
+                                            CornerRadius="16" 
+                                            Padding="30" 
+                                            Margin="0,0,0,20">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Ubicación -->
+                                            <TextBlock Grid.Row="0" 
+                                                       Text="{Binding Settings.LocationName}" 
+                                                       FontSize="28" 
+                                                       FontWeight="Bold" 
+                                                       Foreground="White" 
+                                                       HorizontalAlignment="Center"
+                                                       Margin="0,0,0,20"/>
+
+                                            <!-- Icono y Temperatura -->
+                                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+                                                <TextBlock Text="{Binding WeatherIcon}" 
+                                                           FontSize="100" 
+                                                           Foreground="White" 
+                                                           VerticalAlignment="Center"
+                                                           Margin="0,0,25,0">
+                                                    <TextBlock.Effect>
+                                                        <DropShadowEffect BlurRadius="10" ShadowDepth="3" Opacity="0.3"/>
+                                                    </TextBlock.Effect>
+                                                </TextBlock>
+                                                <TextBlock Text="{Binding CurrentTemperature}" 
+                                                           FontSize="90" 
+                                                           FontWeight="Heavy" 
+                                                           Foreground="White" 
+                                                           VerticalAlignment="Center">
+                                                    <TextBlock.Effect>
+                                                        <DropShadowEffect BlurRadius="10" ShadowDepth="3" Opacity="0.3"/>
+                                                    </TextBlock.Effect>
+                                                </TextBlock>
+                                            </StackPanel>
+
+                                            <!-- Descripción -->
+                                            <TextBlock Grid.Row="2" 
+                                                       Text="{Binding CurrentDescription}" 
+                                                       FontSize="22" 
+                                                       FontWeight="SemiBold" 
+                                                       Foreground="#E0F7FA" 
+                                                       HorizontalAlignment="Center"
+                                                       TextWrapping="Wrap"
+                                                       TextAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Detalles del clima en cuadrícula -->
+                                    <TextBlock Text="Xehetasunak" FontSize="18" FontWeight="Bold" Foreground="#2C3E50" Margin="0,10,0,15"/>
+                                    <Grid Margin="0,0,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Sensación térmica -->
+                                        <Border Grid.Row="0" Grid.Column="0" Background="#F9FAFB" CornerRadius="10" Padding="15" Margin="5">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock Text="🌡️" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                                <TextBlock Text="Sentsazioa" FontSize="12" Foreground="#6B7280" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                                                <TextBlock Text="{Binding FeelsLike}" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Humedad -->
+                                        <Border Grid.Row="0" Grid.Column="1" Background="#F9FAFB" CornerRadius="10" Padding="15" Margin="5">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock Text="💧" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                                <TextBlock Text="Hezetasuna" FontSize="12" Foreground="#6B7280" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                                                <TextBlock Text="{Binding Humidity}" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Viento -->
+                                        <Border Grid.Row="0" Grid.Column="2" Background="#F9FAFB" CornerRadius="10" Padding="15" Margin="5">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock Text="💨" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                                <TextBlock Text="Haizea" FontSize="12" Foreground="#6B7280" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                                                <TextBlock Text="{Binding WindSpeed}" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Presión -->
+                                        <Border Grid.Row="1" Grid.Column="0" Background="#F9FAFB" CornerRadius="10" Padding="15" Margin="5,5,5,5">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock Text="🔽" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                                <TextBlock Text="Presioa" FontSize="12" Foreground="#6B7280" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                                                <TextBlock Text="{Binding Pressure}" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Visibilidad -->
+                                        <Border Grid.Row="1" Grid.Column="1" Background="#F9FAFB" CornerRadius="10" Padding="15" Margin="5,5,5,5">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock Text="👁️" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                                <TextBlock Text="Ikusgarritasuna" FontSize="12" Foreground="#6B7280" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                                                <TextBlock Text="{Binding Visibility}" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Nubes -->
+                                        <Border Grid.Row="1" Grid.Column="2" Background="#F9FAFB" CornerRadius="10" Padding="15" Margin="5,5,5,5">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock Text="☁️" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                                <TextBlock Text="Hodeiak" FontSize="12" Foreground="#6B7280" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                                                <TextBlock Text="{Binding Clouds}" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- PESTAÑA 2: CONFIGURACIÓN -->
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⚙️" FontSize="18" Margin="0,0,8,0"/>
+                            <TextBlock Text="Konfigurazioa" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="#F0F4F8">
+                        <StackPanel Padding="20">
+
+                            <!-- Kokapena -->
+                            <Border Background="White" CornerRadius="12" Padding="20" Margin="0,0,0,20" Effect="{StaticResource SoftShadow}">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,15">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="📍" FontSize="20" Margin="0,0,10,0"/>
+                                        <TextBlock Grid.Column="1" Text="Kokapena" FontSize="18" FontWeight="Bold" Foreground="#2C3E50" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Button Content="📍 Nire Oraingo Kokapena Erabili" Click="UseMyLocation_Click" Style="{StaticResource ModernButtonStyle}" Margin="0,0,0,15" Background="#10B981" Foreground="White" FontWeight="Bold" Height="40" Cursor="Hand"/>
+                                    <CheckBox Content="Oraingo kokapena automatikoki erabili" IsChecked="{Binding UseCurrentLocation}" Margin="0,0,0,15" Foreground="#4A5568"/>
+                                    <Rectangle Height="1" Fill="#EDF2F7" Margin="0,5,0,15"/>
+
+                                    <TextBlock Text="Aukeratu kokapena:" FontSize="13" Foreground="#718096" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                                    <ComboBox ItemsSource="{Binding AvailableLocations}" SelectedItem="{Binding SelectedLocation, Mode=TwoWay}" Margin="0,0,0,15" Height="40" FontSize="14" IsEnabled="{Binding UseCurrentLocation, Converter={StaticResource InverseBooleanConverter}}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding DisplayText}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+
+                                    <TextBlock Text="Kokapenaren izena:" FontSize="13" Foreground="#718096" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                                    <TextBox Text="{Binding Settings.LocationName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,15" Height="36" Padding="10,8" FontSize="14" IsEnabled="{Binding UseCurrentLocation, Converter={StaticResource InverseBooleanConverter}}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Itxura eta Posizioa -->
+                            <Border Background="White" CornerRadius="12" Padding="20" Margin="0,0,0,20" Effect="{StaticResource SoftShadow}">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,15">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="🎨" FontSize="20" Margin="0,0,10,0"/>
+                                        <TextBlock Grid.Column="1" Text="Itxura eta Posizioa" FontSize="18" FontWeight="Bold" Foreground="#2C3E50" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <!-- Posizio azkarren botoiak -->
+                                    <TextBlock Text="Posizio azkarrak:" FontSize="13" Foreground="#718096" Margin="0,0,0,8" FontWeight="SemiBold"/>
+                                    <Grid Margin="0,0,0,20">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        
+                                        <!-- Goian Ezkerrean -->
+                                        <Button Grid.Row="0" Grid.Column="0" 
+                                                Content="⬉ Goian Ezkerrean" 
+                                                Click="SetTopLeft_Click" 
+                                                Background="#6366F1" 
+                                                Foreground="White" 
+                                                FontWeight="SemiBold" 
+                                                Height="40" 
+                                                Margin="0,0,5,5"
+                                                Cursor="Hand"
+                                                FontSize="12"/>
+                                        
+                                        <!-- Goian Eskuinean -->
+                                        <Button Grid.Row="0" Grid.Column="1" 
+                                                Content="Goian Eskuinean ⬈" 
+                                                Click="SetTopRight_Click" 
+                                                Background="#8B5CF6" 
+                                                Foreground="White" 
+                                                FontWeight="SemiBold" 
+                                                Height="40" 
+                                                Margin="5,0,0,5"
+                                                Cursor="Hand"
+                                                FontSize="12"/>
+                                        
+                                        <!-- Behean Ezkerrean -->
+                                        <Button Grid.Row="1" Grid.Column="0" 
+                                                Content="⬋ Behean Ezkerrean" 
+                                                Click="SetBottomLeft_Click" 
+                                                Background="#EC4899" 
+                                                Foreground="White" 
+                                                FontWeight="SemiBold" 
+                                                Height="40" 
+                                                Margin="0,5,5,0"
+                                                Cursor="Hand"
+                                                FontSize="12"/>
+                                        
+                                        <!-- Behean Eskuinean -->
+                                        <Button Grid.Row="1" Grid.Column="1" 
+                                                Content="Behean Eskuinean ⬊" 
+                                                Click="SetBottomRight_Click" 
+                                                Background="#F59E0B" 
+                                                Foreground="White" 
+                                                FontWeight="SemiBold" 
+                                                Height="40" 
+                                                Margin="5,5,0,0"
+                                                Cursor="Hand"
+                                                FontSize="12"/>
+                                    </Grid>
+
+                                    <Rectangle Height="1" Fill="#EDF2F7" Margin="0,0,0,15"/>
+
+                                    <!-- Posizioaren sliderrak -->
+                                    <TextBlock Text="Kokapen horizontala (X):" FontSize="13" Foreground="#718096" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Mugitu widget-a ezkerretik eskuinera" FontSize="11" Foreground="#94A3B8" Margin="0,0,0,8" FontStyle="Italic"/>
+                                    <Grid Margin="0,0,0,15">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="70"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Slider Grid.Column="0" Value="{Binding Settings.WidgetLeft, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="1570" TickFrequency="10" IsSnapToTickEnabled="False" VerticalAlignment="Center" Height="30"/>
+                                        <Border Grid.Column="1" Background="#EDF2F7" CornerRadius="5" Margin="10,0,0,0" Padding="8,5">
+                                            <TextBlock Text="{Binding Settings.WidgetLeft, StringFormat='{}{0:F0} px'}" FontSize="12" FontWeight="Bold" Foreground="#4A5568" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <TextBlock Text="Kokapen bertikala (Y):" FontSize="13" Foreground="#718096" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Mugitu widget-a goitik behera" FontSize="11" Foreground="#94A3B8" Margin="0,0,0,8" FontStyle="Italic"/>
+                                    <Grid Margin="0,0,0,15">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="70"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Slider Grid.Column="0" Value="{Binding Settings.WidgetTop, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="570" TickFrequency="10" IsSnapToTickEnabled="False" VerticalAlignment="Center" Height="30"/>
+                                        <Border Grid.Column="1" Background="#EDF2F7" CornerRadius="5" Margin="10,0,0,0" Padding="8,5">
+                                            <TextBlock Text="{Binding Settings.WidgetTop, StringFormat='{}{0:F0} px'}" FontSize="12" FontWeight="Bold" Foreground="#4A5568" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+                                    
+                                    <Rectangle Height="1" Fill="#EDF2F7" Margin="0,5,0,15"/>
+
+                                    <TextBlock Text="Widget-aren opakutasuna:" FontSize="13" Foreground="#718096" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Aldatu widget-aren gardentasuna" FontSize="11" Foreground="#94A3B8" Margin="0,0,0,8" FontStyle="Italic"/>
+                                    <Grid Margin="0,0,0,15">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="70"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Slider Grid.Column="0" Value="{Binding Settings.WidgetOpacity, Mode=TwoWay}" Minimum="0.3" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="True" VerticalAlignment="Center" Height="30"/>
+                                        <Border Grid.Column="1" Background="#EDF2F7" CornerRadius="5" Margin="10,0,0,0" Padding="8,5">
+                                            <TextBlock Text="{Binding Settings.WidgetOpacity, StringFormat='{}{0:P0}'}" FontSize="12" FontWeight="Bold" Foreground="#4A5568" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <TextBlock Text="Widget-aren tamaina:" FontSize="13" Foreground="#718096" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Handitu edo txikitu widget-aren eskala" FontSize="11" Foreground="#94A3B8" Margin="0,0,0,8" FontStyle="Italic"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="70"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Slider Grid.Column="0" Value="{Binding Settings.WidgetScale, Mode=TwoWay}" Minimum="0.5" Maximum="1.5" TickFrequency="0.05" IsSnapToTickEnabled="True" VerticalAlignment="Center" Height="30"/>
+                                        <Border Grid.Column="1" Background="#EDF2F7" CornerRadius="5" Margin="10,0,0,0" Padding="8,5">
+                                            <TextBlock Text="{Binding Settings.WidgetScale, StringFormat='{}{0:P0}'}" FontSize="12" FontWeight="Bold" Foreground="#4A5568" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Eguneraketa ezarpenak -->
+                            <Border Background="White" CornerRadius="12" Padding="20" Margin="0,0,0,20" Effect="{StaticResource SoftShadow}">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,15">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="⏱️" FontSize="20" Margin="0,0,10,0"/>
+                                        <TextBlock Grid.Column="1" Text="Eguneraketak" FontSize="18" FontWeight="Bold" Foreground="#2C3E50" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <TextBlock Text="Eguneraketa tartea (minutuak):" FontSize="13" Foreground="#718096" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Eguraldiaren datuak zenbat maiztasunez eguneratu" FontSize="11" Foreground="#94A3B8" Margin="0,0,0,8" FontStyle="Italic"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="70"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Slider Grid.Column="0" Value="{Binding Settings.RefreshInterval, Mode=TwoWay}" Minimum="5" Maximum="120" TickFrequency="5" IsSnapToTickEnabled="True" VerticalAlignment="Center" Height="30"/>
+                                        <Border Grid.Column="1" Background="#EDF2F7" CornerRadius="5" Margin="10,0,0,0" Padding="8,5">
+                                            <TextBlock Text="{Binding Settings.RefreshInterval, StringFormat='{}{0} min'}" FontSize="12" FontWeight="Bold" Foreground="#4A5568" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+
+            <Border Grid.Row="2" Background="White" Padding="15,15,20,15">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="-2" Opacity="0.05" Color="Black"/>
+                </Border.Effect>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="1" Content="🔄 Orain Eguneratu" Click="RefreshButton_Click" Background="#3182CE" Foreground="White" FontWeight="Bold" Padding="15,10" Margin="0,0,10,0" Cursor="Hand" Height="40" FontSize="13"/>
+                    <Button Grid.Column="2" Content="⬇️ Ezkutatu" Click="HideButton_Click" Background="#E2E8F0" Foreground="#4A5568" FontWeight="Bold" Padding="15,10" Cursor="Hand" Height="40" FontSize="13"/>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

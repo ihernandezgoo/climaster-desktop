@@ -1,0 +1,474 @@
+﻿using System;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Effects;
+using System.Windows.Shapes;
+using climaster.Converters;
+using climaster.ViewModels;
+
+namespace climaster;
+
+public class WeatherWidget : Window
+{
+    private readonly WeatherViewModel _viewModel;
+
+    public WeatherWidget(WeatherViewModel viewModel)
+    {
+        _viewModel = viewModel;
+        DataContext = _viewModel;
+
+        Title = "Eguraldiaren Widget-a";
+        WindowStyle = WindowStyle.None;
+        AllowsTransparency = true;
+        Background = Brushes.Transparent;
+        Topmost = false;
+        ResizeMode = ResizeMode.NoResize;
+        ShowInTaskbar = false;
+
+        FontFamily = new FontFamily("Segoe UI, Tahoma, Geneva, Verdana, sans-serif");
+        SizeToContent = SizeToContent.Manual;
+        Width = 360;
+        Height = 500;
+
+        Content = CreateWidgetUI();
+
+        MouseDoubleClick += (s, e) =>
+        {
+            var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
+            if (mainWindow != null)
+            {
+                mainWindow.Show();
+                mainWindow.WindowState = WindowState.Normal;
+                mainWindow.Activate();
+            }
+        };
+
+        // Kargatzean gertaera aldatua konfiguratzailetik mugimendua onartzeko
+        Loaded += (s, e) =>
+        {
+            // Posizioa inoiz gorde ez bada (balio lehenetsiak), X=1570, Y=0 erabili
+            if (_viewModel.Settings.WidgetLeft == 1570 && _viewModel.Settings.WidgetTop == 0)
+            {
+                // Lehenetsi den posizioan dago
+                _viewModel.Settings.WidgetLeft = 1570;
+                _viewModel.Settings.WidgetTop = 0;
+            }
+
+            // Hasierako posizioa ezarri
+            Left = _viewModel.Settings.WidgetLeft;
+            Top = _viewModel.Settings.WidgetTop;
+
+            // Leihoaren posizioa konfiguratzaileko Slider-ekin lotu (DataBinding)
+            var leftBinding = new Binding("Settings.WidgetLeft") 
+            { 
+                Source = _viewModel, 
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
+            SetBinding(Window.LeftProperty, leftBinding);
+
+            var topBinding = new Binding("Settings.WidgetTop") 
+            { 
+                Source = _viewModel, 
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
+            SetBinding(Window.TopProperty, topBinding);
+
+            SendToBottom();
+        };
+
+        // Posizioa gorde itxieran
+        Closing += (s, e) =>
+        {
+            _viewModel.Settings.WidgetLeft = Left;
+            _viewModel.Settings.WidgetTop = Top;
+            Models.SettingsManager.SaveSettings(_viewModel.Settings);
+        };
+    }
+
+    private void SendToBottom()
+    {
+        var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+        SetWindowPos(hwnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    }
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+    private static readonly IntPtr HWND_BOTTOM = new IntPtr(1);
+    private const uint SWP_NOSIZE = 0x0001;
+    private const uint SWP_NOMOVE = 0x0002;
+    private const uint SWP_NOACTIVATE = 0x0010;
+
+    private Border CreateWidgetUI()
+    {
+        var mainBorder = new Border
+        {
+            Width = 320,
+            Height = 460,
+            CornerRadius = new CornerRadius(24),
+            Margin = new Thickness(20),
+            BorderThickness = new Thickness(1.5)
+        };
+
+        // Bind border color
+        var borderBrushBinding = new Binding("Settings.BorderColor")
+        {
+            Source = _viewModel,
+            Converter = Application.Current.Resources["StringToColorBrushConverter"] as IValueConverter
+        };
+        mainBorder.SetBinding(Border.BorderBrushProperty, borderBrushBinding);
+
+        // Bind gradient background
+        var gradient = new LinearGradientBrush
+        {
+            StartPoint = new Point(0, 0),
+            EndPoint = new Point(1, 1)
+        };
+
+        var stop1 = new GradientStop { Offset = 0 };
+        var stop2 = new GradientStop { Offset = 1 };
+
+        BindingOperations.SetBinding(stop1, GradientStop.ColorProperty, new Binding("Settings.GradientColor1")
+        {
+            Source = _viewModel,
+            Converter = new ColorStringToColorConverter()
+        });
+
+        BindingOperations.SetBinding(stop2, GradientStop.ColorProperty, new Binding("Settings.GradientColor2")
+        {
+            Source = _viewModel,
+            Converter = new ColorStringToColorConverter()
+        });
+
+        gradient.GradientStops.Add(stop1);
+        gradient.GradientStops.Add(stop2);
+        mainBorder.Background = gradient;
+
+        mainBorder.Effect = new DropShadowEffect
+        {
+            BlurRadius = 25,
+            ShadowDepth = 8,
+            Opacity = 0.4,
+            Color = Colors.Black
+        };
+
+        var opacityBinding = new Binding("Settings.WidgetOpacity") { Source = _viewModel };
+        mainBorder.SetBinding(Border.OpacityProperty, opacityBinding);
+
+        var scaleTransform = new ScaleTransform();
+        BindingOperations.SetBinding(scaleTransform, ScaleTransform.ScaleXProperty, new Binding("Settings.WidgetScale") { Source = _viewModel });
+        BindingOperations.SetBinding(scaleTransform, ScaleTransform.ScaleYProperty, new Binding("Settings.WidgetScale") { Source = _viewModel });
+        mainBorder.LayoutTransform = scaleTransform;
+
+        var mainGrid = new Grid { Margin = new Thickness(20) };
+        mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+        mainGrid.Children.Add(CreateHeader());
+        Grid.SetRow((UIElement)mainGrid.Children[0], 0);
+
+        mainGrid.Children.Add(CreateMainWeatherDisplay());
+        Grid.SetRow((UIElement)mainGrid.Children[1], 1);
+
+        mainGrid.Children.Add(CreateWeatherDetails());
+        Grid.SetRow((UIElement)mainGrid.Children[2], 2);
+
+        mainBorder.Child = mainGrid;
+        return mainBorder;
+    }
+
+    // Helper converter class
+    private class ColorStringToColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is string colorString)
+            {
+                try
+                {
+                    return (Color)ColorConverter.ConvertFromString(colorString);
+                }
+                catch
+                {
+                    return Colors.White;
+                }
+            }
+            return Colors.White;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    private StackPanel CreateHeader()
+    {
+        var header = new StackPanel { Margin = new Thickness(0, 0, 0, 10) };
+
+        // Bind visibility
+        var visibilityBinding = new Binding("Settings.ShowLocation")
+        {
+            Source = _viewModel,
+            Converter = Application.Current.Resources["BoolToVisibilityConverter"] as IValueConverter
+        };
+        header.SetBinding(StackPanel.VisibilityProperty, visibilityBinding);
+
+        var locationText = new TextBlock
+        {
+            FontWeight = FontWeights.Bold,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            TextAlignment = TextAlignment.Center,
+            TextWrapping = TextWrapping.Wrap,
+            MaxWidth = 280
+        };
+
+        // Bind font size
+        locationText.SetBinding(TextBlock.FontSizeProperty, new Binding("Settings.LocationFontSize") { Source = _viewModel });
+
+        // Bind text color
+        var textColorBinding = new Binding("Settings.TextColor")
+        {
+            Source = _viewModel,
+            Converter = Application.Current.Resources["StringToColorBrushConverter"] as IValueConverter
+        };
+        locationText.SetBinding(TextBlock.ForegroundProperty, textColorBinding);
+
+        // Bind font family
+        locationText.SetBinding(TextBlock.FontFamilyProperty, new Binding("Settings.FontFamily")
+        {
+            Source = _viewModel,
+            Converter = new FontFamilyStringConverter()
+        });
+
+        locationText.SetBinding(TextBlock.TextProperty, new Binding("Settings.LocationName") { Source = _viewModel });
+
+        header.Children.Add(locationText);
+        return header;
+    }
+
+    // Helper converter for FontFamily
+    private class FontFamilyStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is string fontName && !string.IsNullOrEmpty(fontName))
+            {
+                return new FontFamily(fontName);
+            }
+            return new FontFamily("Segoe UI");
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is FontFamily fontFamily)
+            {
+                return fontFamily.Source;
+            }
+            return "Segoe UI";
+        }
+    }
+
+    private StackPanel CreateMainWeatherDisplay()
+    {
+        var mainDisplay = new StackPanel
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+
+        var textShadow = new DropShadowEffect { BlurRadius = 10, ShadowDepth = 3, Opacity = 0.3 };
+
+        // Icon
+        var iconText = new TextBlock
+        {
+            FontSize = 80,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Margin = new Thickness(0, 0, 0, 8),
+            Effect = textShadow
+        };
+
+        var iconVisibilityBinding = new Binding("Settings.ShowIcon")
+        {
+            Source = _viewModel,
+            Converter = Application.Current.Resources["BoolToVisibilityConverter"] as IValueConverter
+        };
+        iconText.SetBinding(TextBlock.VisibilityProperty, iconVisibilityBinding);
+
+        var iconColorBinding = new Binding("Settings.TextColor")
+        {
+            Source = _viewModel,
+            Converter = Application.Current.Resources["StringToColorBrushConverter"] as IValueConverter
+        };
+        iconText.SetBinding(TextBlock.ForegroundProperty, iconColorBinding);
+        iconText.SetBinding(TextBlock.TextProperty, new Binding("WeatherIcon") { Source = _viewModel });
+
+        // Temperature
+        var tempText = new TextBlock
+        {
+            FontWeight = FontWeights.Heavy,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Effect = textShadow,
+            Margin = new Thickness(0, 0, 0, 0)
+        };
+
+        var tempVisibilityBinding = new Binding("Settings.ShowTemperature")
+        {
+            Source = _viewModel,
+            Converter = Application.Current.Resources["BoolToVisibilityConverter"] as IValueConverter
+        };
+        tempText.SetBinding(TextBlock.VisibilityProperty, tempVisibilityBinding);
+
+        tempText.SetBinding(TextBlock.FontSizeProperty, new Binding("Settings.TemperatureFontSize") { Source = _viewModel });
+
+        var tempColorBinding = new Binding("Settings.TextColor")
+        {
+            Source = _viewModel,
+            Converter = Application.Current.Resources["StringToColorBrushConverter"] as IValueConverter
+        };
+        tempText.SetBinding(TextBlock.ForegroundProperty, tempColorBinding);
+
+        tempText.SetBinding(TextBlock.FontFamilyProperty, new Binding("Settings.FontFamily")
+        {
+            Source = _viewModel,
+            Converter = new FontFamilyStringConverter()
+        });
+
+        tempText.SetBinding(TextBlock.TextProperty, new Binding("CurrentTemperature") { Source = _viewModel });
+
+        // Description
+        var descText = new TextBlock
+        {
+            FontWeight = FontWeights.SemiBold,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Margin = new Thickness(0, 10, 0, 0),
+            TextWrapping = TextWrapping.Wrap,
+            TextAlignment = TextAlignment.Center,
+            MaxWidth = 280
+        };
+
+        var descVisibilityBinding = new Binding("Settings.ShowDescription")
+        {
+            Source = _viewModel,
+            Converter = Application.Current.Resources["BoolToVisibilityConverter"] as IValueConverter
+        };
+        descText.SetBinding(TextBlock.VisibilityProperty, descVisibilityBinding);
+
+        descText.SetBinding(TextBlock.FontSizeProperty, new Binding("Settings.DescriptionFontSize") { Source = _viewModel });
+
+        var descColorBinding = new Binding("Settings.TextColor")
+        {
+            Source = _viewModel,
+            Converter = Application.Current.Resources["StringToColorBrushConverter"] as IValueConverter
+        };
+        descText.SetBinding(TextBlock.ForegroundProperty, descColorBinding);
+
+        descText.SetBinding(TextBlock.FontFamilyProperty, new Binding("Settings.FontFamily")
+        {
+            Source = _viewModel,
+            Converter = new FontFamilyStringConverter()
+        });
+
+        descText.SetBinding(TextBlock.TextProperty, new Binding("CurrentDescription") { Source = _viewModel });
+
+        mainDisplay.Children.Add(iconText);
+        mainDisplay.Children.Add(tempText);
+        mainDisplay.Children.Add(descText);
+
+        return mainDisplay;
+    }
+
+    private Border CreateWeatherDetails()
+    {
+        var detailsContainer = new Border
+        {
+            CornerRadius = new CornerRadius(16),
+            Padding = new Thickness(8, 12, 8, 12),
+            Margin = new Thickness(0, 15, 0, 0)
+        };
+
+        // Bind background color
+        var bgColorBinding = new Binding("Settings.DetailsBackgroundColor")
+        {
+            Source = _viewModel,
+            Converter = Application.Current.Resources["StringToColorBrushConverter"] as IValueConverter
+        };
+        detailsContainer.SetBinding(Border.BackgroundProperty, bgColorBinding);
+
+        var detailsGrid = new Grid();
+        detailsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        detailsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        detailsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+        var feelsLikePanel = CreateDetailPanel("🌡️", "Sentsazioa", "FeelsLike", "Settings.ShowFeelsLike");
+        detailsGrid.Children.Add(feelsLikePanel);
+        Grid.SetColumn(feelsLikePanel, 0);
+
+        var humidityPanel = CreateDetailPanel("💧", "Hezetasuna", "Humidity", "Settings.ShowHumidity");
+        detailsGrid.Children.Add(humidityPanel);
+        Grid.SetColumn(humidityPanel, 1);
+
+        var windPanel = CreateDetailPanel("💨", "Haizea", "WindSpeed", "Settings.ShowWindSpeed");
+        detailsGrid.Children.Add(windPanel);
+        Grid.SetColumn(windPanel, 2);
+
+        detailsContainer.Child = detailsGrid;
+        return detailsContainer;
+    }
+
+    private StackPanel CreateDetailPanel(string icon, string label, string bindingPath, string visibilityPath)
+    {
+        var panel = new StackPanel { HorizontalAlignment = HorizontalAlignment.Center };
+
+        panel.Children.Add(new TextBlock
+        {
+            Text = icon,
+            FontSize = 20,
+            Foreground = Brushes.White,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Margin = new Thickness(0, 0, 0, 4)
+        });
+
+        panel.Children.Add(new TextBlock
+        {
+            Text = label,
+            FontSize = 10,
+            FontWeight = FontWeights.SemiBold,
+            Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#94A3B8")),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Margin = new Thickness(0, 0, 0, 2),
+            TextWrapping = TextWrapping.Wrap,
+            TextAlignment = TextAlignment.Center,
+            MaxWidth = 90
+        });
+
+        var valueText = new TextBlock
+        {
+            FontSize = 14,
+            FontWeight = FontWeights.Bold,
+            Foreground = Brushes.White,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            TextWrapping = TextWrapping.Wrap,
+            TextAlignment = TextAlignment.Center,
+            MaxWidth = 90
+        };
+        valueText.SetBinding(TextBlock.TextProperty, new Binding(bindingPath) { Source = _viewModel });
+        panel.Children.Add(valueText);
+
+        // Bind visibility of the whole panel
+        var panelVisibilityBinding = new Binding(visibilityPath)
+        {
+            Source = _viewModel,
+            Converter = Application.Current.Resources["BoolToVisibilityConverter"] as IValueConverter
+        };
+        panel.SetBinding(StackPanel.VisibilityProperty, panelVisibilityBinding);
+
+        return panel;
+    }
+}

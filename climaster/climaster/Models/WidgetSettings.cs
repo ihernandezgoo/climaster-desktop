@@ -8,13 +8,69 @@ public class WidgetSettings : INotifyPropertyChanged
     private double _latitude = 43.31;
     private double _longitude = -1.98;
     private int _refreshInterval = 30; // minutuak
-    private double _widgetOpacity = 0.9;
+    private double _widgetOpacity = 1.0; // 100%
     private double _widgetScale = 1.0;
     private bool _showHourlyForecast = true;
     private bool _showDailyForecast = true;
     private string _locationName = "Donostia";
     private bool _useCurrentLocation = false;
     private List<Location> _recentLocations = new List<Location>();
+    private double _widgetLeft = 1570; // Lehenetsi posizioa: eskuinean
+    private double _widgetTop = 0; // Lehenetsi posizioa: goian
+
+    // Personalización de contenido
+    private bool _showLocation = true;
+    private bool _showIcon = true;
+    private bool _showTemperature = true;
+    private bool _showDescription = true;
+    private bool _showFeelsLike = true;
+    private bool _showHumidity = true;
+    private bool _showWindSpeed = true;
+
+    // Selección de contenido para slots de detalles
+    private string _detailSlot1 = "FeelsLike";
+    private string _detailSlot2 = "Humidity";
+    private string _detailSlot3 = "WindSpeed";
+
+    // Personalización de colores
+    private string _gradientColor1 = "#1A2980";
+    private string _gradientColor2 = "#26D0CE";
+    private string _textColor = "#FFFFFF";
+    private string _detailsBackgroundColor = "#3C000000"; // 60 alpha + 000000
+    private string _borderColor = "#32FFFFFF"; // 50 alpha + FFFFFF
+
+    // Personalización de fuentes
+    private string _fontFamily = "Segoe UI";
+    private int _locationFontSize = 20;
+    private int _temperatureFontSize = 64;
+    private int _descriptionFontSize = 16;
+    private int _detailsFontSize = 14;
+
+    public double WidgetLeft 
+    { 
+        get => _widgetLeft;
+        set 
+        { 
+            if (Math.Abs(_widgetLeft - value) > 0.1)
+            {
+                _widgetLeft = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public double WidgetTop 
+    { 
+        get => _widgetTop;
+        set 
+        { 
+            if (Math.Abs(_widgetTop - value) > 0.1)
+            {
+                _widgetTop = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     public double Latitude
     {
@@ -74,6 +130,130 @@ public class WidgetSettings : INotifyPropertyChanged
     {
         get => _recentLocations;
         set { _recentLocations = value; OnPropertyChanged(); }
+    }
+
+    // Propiedades de personalización de contenido
+    public bool ShowLocation
+    {
+        get => _showLocation;
+        set { _showLocation = value; OnPropertyChanged(); }
+    }
+
+    public bool ShowIcon
+    {
+        get => _showIcon;
+        set { _showIcon = value; OnPropertyChanged(); }
+    }
+
+    public bool ShowTemperature
+    {
+        get => _showTemperature;
+        set { _showTemperature = value; OnPropertyChanged(); }
+    }
+
+    public bool ShowDescription
+    {
+        get => _showDescription;
+        set { _showDescription = value; OnPropertyChanged(); }
+    }
+
+    public bool ShowFeelsLike
+    {
+        get => _showFeelsLike;
+        set { _showFeelsLike = value; OnPropertyChanged(); }
+    }
+
+    public bool ShowHumidity
+    {
+        get => _showHumidity;
+        set { _showHumidity = value; OnPropertyChanged(); }
+    }
+
+    public bool ShowWindSpeed
+    {
+        get => _showWindSpeed;
+        set { _showWindSpeed = value; OnPropertyChanged(); }
+    }
+
+    // Propiedades de selección de slots de detalles
+    public string DetailSlot1
+    {
+        get => _detailSlot1;
+        set { _detailSlot1 = value; OnPropertyChanged(); }
+    }
+
+    public string DetailSlot2
+    {
+        get => _detailSlot2;
+        set { _detailSlot2 = value; OnPropertyChanged(); }
+    }
+
+    public string DetailSlot3
+    {
+        get => _detailSlot3;
+        set { _detailSlot3 = value; OnPropertyChanged(); }
+    }
+
+    // Propiedades de personalización de colores
+    public string GradientColor1
+    {
+        get => _gradientColor1;
+        set { _gradientColor1 = value; OnPropertyChanged(); }
+    }
+
+    public string GradientColor2
+    {
+        get => _gradientColor2;
+        set { _gradientColor2 = value; OnPropertyChanged(); }
+    }
+
+    public string TextColor
+    {
+        get => _textColor;
+        set { _textColor = value; OnPropertyChanged(); }
+    }
+
+    public string DetailsBackgroundColor
+    {
+        get => _detailsBackgroundColor;
+        set { _detailsBackgroundColor = value; OnPropertyChanged(); }
+    }
+
+    public string BorderColor
+    {
+        get => _borderColor;
+        set { _borderColor = value; OnPropertyChanged(); }
+    }
+
+    // Propiedades de personalización de fuentes
+    public string FontFamily
+    {
+        get => _fontFamily;
+        set { _fontFamily = value; OnPropertyChanged(); }
+    }
+
+    public int LocationFontSize
+    {
+        get => _locationFontSize;
+        set { _locationFontSize = value; OnPropertyChanged(); }
+    }
+
+    public int TemperatureFontSize
+    {
+        get => _temperatureFontSize;
+        set { _temperatureFontSize = value; OnPropertyChanged(); }
+    }
+
+    public int DescriptionFontSize
+    {
+        get => _descriptionFontSize;
+        set { _descriptionFontSize = value; OnPropertyChanged(); }
+    }
+
+    public int DetailsFontSize
+    {
+        get => _detailsFontSize;
+        set { _detailsFontSize = value; OnPropertyChanged(); }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

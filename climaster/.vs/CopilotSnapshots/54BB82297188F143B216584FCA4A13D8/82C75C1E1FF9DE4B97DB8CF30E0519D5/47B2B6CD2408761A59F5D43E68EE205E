@@ -1,0 +1,265 @@
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace climaster.Models;
+
+public class WidgetSettings : INotifyPropertyChanged
+{
+    private double _latitude = 43.31;
+    private double _longitude = -1.98;
+    private int _refreshInterval = 30; // minutuak
+    private double _widgetOpacity = 1.0; // 100%
+    private double _widgetScale = 1.0;
+    private bool _showHourlyForecast = true;
+    private bool _showDailyForecast = true;
+    private string _locationName = "Donostia";
+    private bool _useCurrentLocation = false;
+    private List<Location> _recentLocations = new List<Location>();
+    private double _widgetLeft = 1570; // Lehenetsi posizioa: eskuinean
+    private double _widgetTop = 0; // Lehenetsi posizioa: goian
+
+    // Personalización de contenido
+    private bool _showLocation = true;
+    private bool _showIcon = true;
+    private bool _showTemperature = true;
+    private bool _showDescription = true;
+    private bool _showFeelsLike = true;
+    private bool _showHumidity = true;
+    private bool _showWindSpeed = true;
+
+    // Personalización de colores
+    private string _gradientColor1 = "#1A2980";
+    private string _gradientColor2 = "#26D0CE";
+    private string _textColor = "#FFFFFF";
+    private string _detailsBackgroundColor = "#3C000000"; // 60 alpha + 000000
+    private string _borderColor = "#32FFFFFF"; // 50 alpha + FFFFFF
+
+    // Personalización de fuentes
+    private string _fontFamily = "Segoe UI";
+    private int _locationFontSize = 20;
+    private int _temperatureFontSize = 64;
+    private int _descriptionFontSize = 16;
+    private int _detailsFontSize = 14;
+
+    public double WidgetLeft 
+    { 
+        get => _widgetLeft;
+        set 
+        { 
+            if (Math.Abs(_widgetLeft - value) > 0.1)
+            {
+                _widgetLeft = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public double WidgetTop 
+    { 
+        get => _widgetTop;
+        set 
+        { 
+            if (Math.Abs(_widgetTop - value) > 0.1)
+            {
+                _widgetTop = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public double Latitude
+    {
+        get => _latitude;
+        set { _latitude = value; OnPropertyChanged(); }
+    }
+
+    public double Longitude
+    {
+        get => _longitude;
+        set { _longitude = value; OnPropertyChanged(); }
+    }
+
+    public int RefreshInterval
+    {
+        get => _refreshInterval;
+        set { _refreshInterval = value; OnPropertyChanged(); }
+    }
+
+    public double WidgetOpacity
+    {
+        get => _widgetOpacity;
+        set { _widgetOpacity = value; OnPropertyChanged(); }
+    }
+
+    public double WidgetScale
+    {
+        get => _widgetScale;
+        set { _widgetScale = value; OnPropertyChanged(); }
+    }
+
+    public bool ShowHourlyForecast
+    {
+        get => _showHourlyForecast;
+        set { _showHourlyForecast = value; OnPropertyChanged(); }
+    }
+
+    public bool ShowDailyForecast
+    {
+        get => _showDailyForecast;
+        set { _showDailyForecast = value; OnPropertyChanged(); }
+    }
+
+    public string LocationName
+    {
+        get => _locationName;
+        set { _locationName = value; OnPropertyChanged(); }
+    }
+
+    public bool UseCurrentLocation
+    {
+        get => _useCurrentLocation;
+        set { _useCurrentLocation = value; OnPropertyChanged(); }
+    }
+
+    public List<Location> RecentLocations
+    {
+        get => _recentLocations;
+        set { _recentLocations = value; OnPropertyChanged(); }
+    }
+
+    // Propiedades de personalización de contenido
+    public bool ShowLocation
+    {
+        get => _showLocation;
+        set { _showLocation = value; OnPropertyChanged(); }
+    }
+
+    public bool ShowIcon
+    {
+        get => _showIcon;
+        set { _showIcon = value; OnPropertyChanged(); }
+    }
+
+    public bool ShowTemperature
+    {
+        get => _showTemperature;
+        set { _showTemperature = value; OnPropertyChanged(); }
+    }
+
+    public bool ShowDescription
+    {
+        get => _showDescription;
+        set { _showDescription = value; OnPropertyChanged(); }
+    }
+
+    public bool ShowFeelsLike
+    {
+        get => _showFeelsLike;
+        set { _showFeelsLike = value; OnPropertyChanged(); }
+    }
+
+    public bool ShowHumidity
+    {
+        get => _showHumidity;
+        set { _showHumidity = value; OnPropertyChanged(); }
+    }
+
+    public bool ShowWindSpeed
+    {
+        get => _showWindSpeed;
+        set { _showWindSpeed = value; OnPropertyChanged(); }
+    }
+
+    // Propiedades de personalización de colores
+    public string GradientColor1
+    {
+        get => _gradientColor1;
+        set { _gradientColor1 = value; OnPropertyChanged(); }
+    }
+
+    public string GradientColor2
+    {
+        get => _gradientColor2;
+        set { _gradientColor2 = value; OnPropertyChanged(); }
+    }
+
+    public string TextColor
+    {
+        get => _textColor;
+        set { _textColor = value; OnPropertyChanged(); }
+    }
+
+    public string DetailsBackgroundColor
+    {
+        get => _detailsBackgroundColor;
+        set { _detailsBackgroundColor = value; OnPropertyChanged(); }
+    }
+
+    public string BorderColor
+    {
+        get => _borderColor;
+        set { _borderColor = value; OnPropertyChanged(); }
+    }
+
+    // Propiedades de personalización de fuentes
+    public string FontFamily
+    {
+        get => _fontFamily;
+        set { _fontFamily = value; OnPropertyChanged(); }
+    }
+
+    public int LocationFontSize
+    {
+        get => _locationFontSize;
+        set { _locationFontSize = value; OnPropertyChanged(); }
+    }
+
+    public int TemperatureFontSize
+    {
+        get => _temperatureFontSize;
+        set { _temperatureFontSize = value; OnPropertyChanged(); }
+    }
+
+    public int DescriptionFontSize
+    {
+        get => _descriptionFontSize;
+        set { _descriptionFontSize = value; OnPropertyChanged(); }
+    }
+
+    public int DetailsFontSize
+    {
+        get => _detailsFontSize;
+        set { _detailsFontSize = value; OnPropertyChanged(); }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public void AddRecentLocation(Location location)
+    {
+        var existing = _recentLocations.FirstOrDefault(l => 
+            l.Name == location.Name && 
+            Math.Abs(l.Latitude - location.Latitude) < 0.01 && 
+            Math.Abs(l.Longitude - location.Longitude) < 0.01);
+        
+        if (existing != null)
+        {
+            _recentLocations.Remove(existing);
+        }
+
+        location.LastUsed = DateTime.Now;
+        location.IsPredefined = false;
+        _recentLocations.Insert(0, location);
+
+        if (_recentLocations.Count > 5)
+        {
+            _recentLocations = _recentLocations.Take(10).ToList();
+        }
+
+        OnPropertyChanged(nameof(RecentLocations));
+    }
+}
