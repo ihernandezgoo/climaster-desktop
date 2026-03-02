@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Climaster_feature.ViewModels;
 
 namespace Climaster_feature.Models
 {
@@ -44,19 +45,83 @@ namespace Climaster_feature.Models
         public int CornerRadius { get; set; } = 24;
     }
 
-    public class WidgetElement
+    public class WidgetElement : ViewModelBase
     {
+        private string _type = string.Empty;
+        private int? _fontSize;
+        private string? _alignment;
+        private int? _days;
+        private bool _isSelected;
+
         [JsonPropertyName("type")]
-        public string Type { get; set; } = string.Empty;
+        public string Type
+        {
+            get => _type;
+            set => SetProperty(ref _type, value);
+        }
 
         [JsonPropertyName("fontSize")]
-        public int? FontSize { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? FontSize
+        {
+            get => _fontSize;
+            set
+            {
+                if (SetProperty(ref _fontSize, value))
+                {
+                    OnPropertyChanged(nameof(HasFontSize));
+                }
+            }
+        }
 
         [JsonPropertyName("alignment")]
-        public string? Alignment { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Alignment
+        {
+            get => _alignment;
+            set
+            {
+                if (SetProperty(ref _alignment, value))
+                {
+                    OnPropertyChanged(nameof(HasAlignment));
+                }
+            }
+        }
 
         [JsonPropertyName("days")]
-        public int? Days { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? Days
+        {
+            get => _days;
+            set
+            {
+                if (SetProperty(ref _days, value))
+                {
+                    OnPropertyChanged(nameof(HasDays));
+                }
+            }
+        }
+
+        // UI-only property
+        [JsonIgnore]
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set => SetProperty(ref _isSelected, value);
+        }
+
+        // Propiedades auxiliares para UI
+        [JsonIgnore]
+        public bool HasFontSize => FontSize.HasValue;
+
+        [JsonIgnore]
+        public bool HasAlignment => !string.IsNullOrEmpty(Alignment);
+
+        [JsonIgnore]
+        public bool HasDays => Days.HasValue;
+
+        [JsonIgnore]
+        public List<string> AvailableAlignments { get; } = new() { "left", "center", "right" };
     }
 
     // Clase auxiliar para tamaños predefinidos

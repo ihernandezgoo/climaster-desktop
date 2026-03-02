@@ -1,4 +1,8 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using Climaster_feature.Models;
+using Climaster_feature.ViewModels;
 
 namespace Climaster_feature
 {
@@ -24,6 +28,22 @@ namespace Climaster_feature
                 {
                     viewModel.StopServerCommand.Execute(null);
                 }
+            }
+        }
+
+        private void ColorButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is string color && DataContext is MainViewModel vm)
+            {
+                vm.BackgroundColor = color;
+            }
+        }
+
+        private void ElementBorder_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Border border && border.Tag is WidgetElement element && DataContext is MainViewModel vm)
+            {
+                vm.SelectElementCommand.Execute(element);
             }
         }
     }

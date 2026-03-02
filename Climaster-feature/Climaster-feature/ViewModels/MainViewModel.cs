@@ -23,6 +23,7 @@ namespace Climaster_feature.ViewModels
         private string _serverUrl = string.Empty;
         private BitmapImage? _qrCodeImage = null;
         private WidgetGridSize _selectedSize;
+        private WidgetElement? _selectedElement;
 
         public MainViewModel()
         {
@@ -31,7 +32,7 @@ namespace Climaster_feature.ViewModels
 
             // Initialize available sizes
             InitializeWidgetSizes();
-            _selectedSize = AvailableSizes[1]; // Default: 4x2 (Ertaina)
+            _selectedSize = AvailableSizes[3]; // Default: 4x2 (Ertaina)
 
             // Commands
             AddElementCommand = new RelayCommand<string>(AddElement);
@@ -43,6 +44,24 @@ namespace Climaster_feature.ViewModels
             StartServerCommand = new AsyncRelayCommand(StartServerAsync);
             StopServerCommand = new RelayCommand(StopServer);
             SaveJsonCommand = new RelayCommand(SaveJson);
+            SelectElementCommand = new RelayCommand<WidgetElement>(SelectElement);
+
+            // Subscribe to property changes in LayoutElements
+            LayoutElements.CollectionChanged += (s, e) =>
+            {
+                if (e.NewItems != null)
+                {
+                    foreach (WidgetElement item in e.NewItems)
+                    {
+                        item.PropertyChanged += (sender, args) => UpdatePreviewJson();
+                    }
+                }
+                OnPropertyChanged(nameof(CurrentElementsInfo));
+                OnPropertyChanged(nameof(CanAddMoreElements));
+                OnPropertyChanged(nameof(UsedSpacePercentage));
+                OnPropertyChanged(nameof(RemainingSpace));
+                UpdatePreviewJson();
+            };
 
             // Initialize with default elements
             LayoutElements.Add(new WidgetElement { Type = "current_temp", FontSize = 48, Alignment = "center" });
@@ -53,6 +72,18 @@ namespace Climaster_feature.ViewModels
 
         public ObservableCollection<WidgetElement> LayoutElements { get; } = new();
         public ObservableCollection<WidgetGridSize> AvailableSizes { get; } = new();
+        public ObservableCollection<string> PredefinedColors { get; } = new()
+        {
+            "#33FFFFFF", "#55000000", "#77FFFFFF", "#99000000",
+            "#554CAF50", "#55F44336", "#552196F3", "#55FF9800",
+            "#55FFC107", "#5500BCD4", "#559C27B0", "#55FF5722"
+        };
+
+        public WidgetElement? SelectedElement
+        {
+            get => _selectedElement;
+            set => SetProperty(ref _selectedElement, value);
+        }
 
         public WidgetGridSize SelectedSize
         {
@@ -66,6 +97,9 @@ namespace Climaster_feature.ViewModels
                     OnPropertyChanged(nameof(CanAddMoreElements));
                     OnPropertyChanged(nameof(RecommendedElementsInfo));
                     OnPropertyChanged(nameof(CurrentSizeInfo));
+                    OnPropertyChanged(nameof(UsedSpacePercentage));
+                    OnPropertyChanged(nameof(RemainingSpace));
+                    OnPropertyChanged(nameof(SpaceStatusColor));
                     UpdatePreviewJson();
                 }
             }
@@ -76,8 +110,29 @@ namespace Climaster_feature.ViewModels
         public string CurrentSizeInfo => $"{SelectedSize.Width}x{SelectedSize.Height} bloke";
         public bool CanAddMoreElements => CalculateTotalElementSize() < SelectedSize.MaxElements;
         public string RecommendedElementsInfo => string.Join("\n• ", SelectedSize.RecommendedElements.Prepend(""));
+        
+        public double UsedSpacePercentage
+        {
+            get
+            {
+                if (SelectedSize.MaxElements == 0) return 0;
+                return (double)CalculateTotalElementSize() / SelectedSize.MaxElements * 100;
+            }
+        }
 
-        // ...existing properties...
+        public int RemainingSpace => SelectedSize.MaxElements - CalculateTotalElementSize();
+
+        public string SpaceStatusColor
+        {
+            get
+            {
+                double percentage = UsedSpacePercentage;
+                if (percentage >= 90) return "#F44336"; // Red
+                if (percentage >= 70) return "#FF9800"; // Orange
+                if (percentage >= 50) return "#FFC107"; // Yellow
+                return "#4CAF50"; // Green
+            }
+        }
         public string WidgetId
         {
             get => _widgetId;
@@ -141,6 +196,24 @@ namespace Climaster_feature.ViewModels
         public ICommand StartServerCommand { get; }
         public ICommand StopServerCommand { get; }
         public ICommand SaveJsonCommand { get; }
+        public ICommand SelectElementCommand { get; }
+
+        private void SelectElement(WidgetElement? element)
+        {
+            // Deselect all elements first
+            foreach (var el in LayoutElements)
+            {
+                el.IsSelected = false;
+            }
+            
+            // Select the clicked element
+            if (element != null)
+            {
+                element.IsSelected = true;
+            }
+            
+            SelectedElement = element;
+        }
 
         private void InitializeWidgetSizes()
         {
@@ -284,8 +357,15 @@ namespace Climaster_feature.ViewModels
             if (element != null)
             {
                 LayoutElements.Remove(element);
+                if (SelectedElement == element)
+                {
+                    SelectedElement = null;
+                }
                 OnPropertyChanged(nameof(CurrentElementsInfo));
                 OnPropertyChanged(nameof(CanAddMoreElements));
+                OnPropertyChanged(nameof(UsedSpacePercentage));
+                OnPropertyChanged(nameof(RemainingSpace));
+                OnPropertyChanged(nameof(SpaceStatusColor));
                 UpdatePreviewJson();
             }
         }

@@ -4,6 +4,7 @@ using System.Windows.Media;
 using Climaster_feature.Models;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace Climaster_feature.Views
 {
@@ -50,16 +51,24 @@ namespace Climaster_feature.Views
         {
             if (d is AndroidWidgetPreview preview)
             {
-                // Unsubscribe from previous collection
+                // Unsubscribe from previous collection and its items
                 if (preview._previousCollection != null)
                 {
                     preview._previousCollection.CollectionChanged -= preview.OnCollectionChanged;
+                    foreach (var item in preview._previousCollection)
+                    {
+                        item.PropertyChanged -= preview.OnElementPropertyChanged;
+                    }
                 }
 
-                // Subscribe to new collection
+                // Subscribe to new collection and its items
                 if (e.NewValue is ObservableCollection<WidgetElement> newCollection)
                 {
                     newCollection.CollectionChanged += preview.OnCollectionChanged;
+                    foreach (var item in newCollection)
+                    {
+                        item.PropertyChanged += preview.OnElementPropertyChanged;
+                    }
                     preview._previousCollection = newCollection;
                 }
 
@@ -69,8 +78,36 @@ namespace Climaster_feature.Views
 
         private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
+            // Subscribe to new items
+            if (e.NewItems != null)
+            {
+                foreach (WidgetElement item in e.NewItems)
+                {
+                    item.PropertyChanged += OnElementPropertyChanged;
+                }
+            }
+
+            // Unsubscribe from old items
+            if (e.OldItems != null)
+            {
+                foreach (WidgetElement item in e.OldItems)
+                {
+                    item.PropertyChanged -= OnElementPropertyChanged;
+                }
+            }
+
             // Re-render when collection changes
             RenderWidget();
+        }
+
+        private void OnElementPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            // Re-render when any element property changes
+            // Ignore IsSelected changes as they don't affect rendering
+            if (e.PropertyName != nameof(WidgetElement.IsSelected))
+            {
+                RenderWidget();
+            }
         }
 
         private void RenderWidget()
@@ -111,7 +148,7 @@ namespace Climaster_feature.Views
                 "horizontal_divider" => CreateDivider(),
                 "daily_forecast_row" => CreateDailyForecast(element),
                 "humidity" => CreateInfoControl("??", "Humedad: 65%", element),
-                "wind_speed" => CreateInfoControl("??", "Viento: 15 km/h", element),
+                "wind_speed" => CreateInfoControl("???", "Viento: 15 km/h", element),
                 "hourly_forecast" => CreateHourlyForecast(),
                 _ => null
             };
@@ -193,7 +230,7 @@ namespace Climaster_feature.Views
             }
 
             string[] dayNames = { "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom" };
-            string[] icons = { "??", "???", "?" };
+            string[] icons = { "??", "?", "??" };
 
             for (int i = 0; i < days; i++)
             {
@@ -262,7 +299,7 @@ namespace Climaster_feature.Views
 
                 hourStack.Children.Add(new TextBlock
                 {
-                    Text = i % 2 == 0 ? "??" : "?",
+                    Text = i % 2 == 0 ? "??" : "??",
                     FontSize = 20,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     Margin = new Thickness(0, 5, 0, 5)

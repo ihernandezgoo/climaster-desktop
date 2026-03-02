@@ -27,20 +27,12 @@ namespace Climaster_feature.Services
         {
             try
             {
-                var qrGenerator = new QRCodeGenerator();
-                var qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q);
-                var qrCode = new QRCode(qrCodeData);
+                using var qrGenerator = new QRCodeGenerator();
+                using var qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q);
+                using var qrCode = new QRCode(qrCodeData);
                 
-                // Don't use 'using' here because we're returning the Bitmap
-                // The caller is responsible for disposing it (or BitmapHelper will handle it)
-                var bitmap = qrCode.GetGraphic(20);
-                
-                // Cleanup QR objects but NOT the bitmap
-                qrCode.Dispose();
-                qrCodeData.Dispose();
-                qrGenerator.Dispose();
-                
-                return bitmap;
+                // Return the bitmap - it will be disposed by BitmapHelper
+                return qrCode.GetGraphic(20);
             }
             catch (Exception ex)
             {
