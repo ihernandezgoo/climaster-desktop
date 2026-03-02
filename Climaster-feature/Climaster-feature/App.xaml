@@ -1,0 +1,15 @@
+﻿<Application x:Class="Climaster_feature.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Climaster_feature"
+             xmlns:conv="clr-namespace:Climaster_feature.Converters"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!-- Converters -->
+        <conv:InverseBoolConverter x:Key="InverseBoolConverter"/>
+        <conv:NullToBoolConverter x:Key="NullToBoolConverter"/>
+        <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+    </Application.Resources>
+</Application>

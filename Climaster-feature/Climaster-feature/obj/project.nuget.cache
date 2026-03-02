@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "72eVfuHxM1g=",
+  "success": true,
+  "projectFilePath": "D:\\climaster-desktop\\Climaster-feature\\Climaster-feature\\Climaster-feature.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ik012982i18\\.nuget\\packages\\microsoft.win32.systemevents\\10.0.3\\microsoft.win32.systemevents.10.0.3.nupkg.sha512",
+    "C:\\Users\\ik012982i18\\.nuget\\packages\\qrcoder\\1.7.0\\qrcoder.1.7.0.nupkg.sha512",
+    "C:\\Users\\ik012982i18\\.nuget\\packages\\system.drawing.common\\10.0.3\\system.drawing.common.10.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
