@@ -32,7 +32,7 @@ Interfaze bisual batekin widget-aren itxura eta edukia kontrolatu ditzakezu, eta
 
 ```bash
 git clone https://github.com/ihernandezgoo/climaster-desktop.git
-cd climaster-desktop/Climaster-feature
+cd climaster-desktop/climaster-desktop
 dotnet restore
 dotnet run
 ```
