@@ -13,7 +13,7 @@ Interfaze bisual batekin widget-aren itxura eta edukia kontrolatu ditzakezu, eta
 
 ### ✨ Ezaugarri nagusiak
 
-- 🧩 **Diseinu bisuala**: drag & drop eta aurrebista denbora errealean
+- 🧩 **Diseinu bisuala**: aurrebista denbora errealean
 - 📲 **QR esportazioa**: sortu, eskaneatu eta inportatu azkar
 - 🎨 **Pertsonalizazio osoa**: koloreak, tamainak, ertzak eta elementuak
 - 🧊 **Glassmorphism estiloa**: itxura moderno eta garbia
@@ -170,22 +170,10 @@ git push origin feature/nire-ezaugarria
 ## 📬 Laguntza
 
 - 🐞 Arazoak: [GitHub Issues](https://github.com/ihernandezgoo/climaster-desktop/issues)
-- ✉️ Emaila: ihernandezgoo@gmail.com
 
 ---
 
 ## 📄 Lizentzia
 
-MIT License — Copyright (c) 2024 Iker Hernández
-
----
-
-<div align="center">
-
-**❤️-rekin egina Euskal Herrian**
-
-🌤️ **CliMaster** — Zure eguraldi widget-a, zure modura
-
-[![GitHub stars](https://img.shields.io/github/stars/ihernandezgoo/climaster-desktop?style=social)](https://github.com/ihernandezgoo/climaster-desktop)
-
-</div>
+MIT License — CC BY
+Ibai Garrido eta Ivan Hernandez
