@@ -11,7 +11,7 @@
         mc:Ignorable="d"
         Title="{x:Static res:Strings.AppTitle}" 
         Height="850" 
-        Width="1650"
+        Width="1750"
         WindowStartupLocation="CenterScreen"
         Background="#0D1117">
     
@@ -303,7 +303,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="350"/>
+            <ColumnDefinition Width="450"/>
             <ColumnDefinition Width="350"/>
         </Grid.ColumnDefinitions>
 
@@ -467,6 +467,74 @@
                                 Height="40"/>
                     </Grid>
 
+                    <!-- Base Color (without opacity) -->
+                    <TextBlock Text="Oinarrizko Kolorea:" Foreground="#B0B0B0" FontSize="11" Margin="0,0,0,5"/>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="50"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <TextBox Grid.Column="0"
+                                Text="{Binding BaseColor, UpdateSourceTrigger=PropertyChanged}" 
+                                Style="{StaticResource GlassTextBox}"
+                                Margin="0,0,5,0"
+                                ToolTip="Color sin transparencia (ej: #FFFFFF)"/>
+                        
+                        <!-- Color Preview -->
+                        <Border Grid.Column="1"
+                                Background="{Binding BaseColor, Converter={StaticResource HexToColorConverter}}"
+                                BorderBrush="#FFFFFF"
+                                BorderThickness="2"
+                                CornerRadius="8"
+                                Height="40"/>
+                    </Grid>
+
+                    <!-- Opacity Control -->
+                    <TextBlock Text="Gardentasuna (Opacity):" Foreground="#B0B0B0" FontSize="11" Margin="0,0,0,5"/>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <Slider Grid.Row="0"
+                                Value="{Binding BackgroundOpacity, UpdateSourceTrigger=PropertyChanged}" 
+                                Minimum="0" 
+                                Maximum="100" 
+                                TickFrequency="5" 
+                                IsSnapToTickEnabled="True"
+                                Margin="0,0,0,5"
+                                ToolTip="0% = Guztiz gardena, 100% = Opakua"/>
+                        
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBlock Grid.Column="0"
+                                      Text="🔲 Gardena" 
+                                      Foreground="#888" 
+                                      FontSize="9" 
+                                      HorizontalAlignment="Left"/>
+                            
+                            <TextBlock Grid.Column="1"
+                                      Text="{Binding OpacityPercentage}" 
+                                      Foreground="#4CAF50" 
+                                      FontSize="12" 
+                                      FontWeight="Bold"
+                                      HorizontalAlignment="Center"/>
+                            
+                            <TextBlock Grid.Column="2"
+                                      Text="⬛ Opakua" 
+                                      Foreground="#FFF" 
+                                      FontSize="9" 
+                                      HorizontalAlignment="Right"/>
+                        </Grid>
+                    </Grid>
+
                     <!-- Predefined Colors -->
                     <TextBlock Text="Koloreak:" Foreground="#B0B0B0" FontSize="10" Margin="0,0,0,5"/>
                     <ItemsControl ItemsSource="{Binding PredefinedColors}">
@@ -486,7 +554,8 @@
                                         Command="{Binding DataContext.SelectElementCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                         Click="ColorButton_Click"
                                         Tag="{Binding}"
-                                        Cursor="Hand">
+                                        Cursor="Hand"
+                                        ToolTip="{Binding}">
                                     <Button.Template>
                                         <ControlTemplate TargetType="Button">
                                             <Border Background="{TemplateBinding Background}"
@@ -523,6 +592,13 @@
                                FontWeight="Bold" 
                                Foreground="White" 
                                Margin="0,0,0,8"/>
+
+                    <Button Content="{x:Static res:Strings.LocationName}" 
+                            Style="{StaticResource GlassButton}"
+                            Command="{Binding AddElementCommand}"
+                            CommandParameter="location_name"
+                            IsEnabled="{Binding CanAddMoreElements}"
+                            Margin="0,0,0,6"/>
 
                     <Button Content="{x:Static res:Strings.Temperature}" 
                             Style="{StaticResource GlassButton}"
@@ -564,13 +640,6 @@
                             Command="{Binding AddElementCommand}"
                             CommandParameter="daily_forecast_row"
                             IsEnabled="{Binding CanAddMoreElements}"
-                            Margin="0,0,0,6"/>
-
-                    <Button Content="{x:Static res:Strings.HourlyForecast}" 
-                            Style="{StaticResource GlassButton}"
-                            Command="{Binding AddElementCommand}"
-                            CommandParameter="hourly_forecast"
-                            IsEnabled="{Binding CanAddMoreElements}"
                             Margin="0,0,0,15"/>
 
                     <!-- Actions -->
@@ -594,7 +663,7 @@
                             ToolTip="{x:Static res:Strings.TooltipGenerateQR}"/>
 
                   
-                   
+                  
                 </StackPanel>
             </ScrollViewer>
         </Border>
@@ -650,12 +719,6 @@
                                                         Visibility="{Binding FontSize, Converter={StaticResource NullToVisibilityConverter}}">
                                                 <TextBlock Text="{x:Static res:Strings.FontSize}" Foreground="#B0B0B0" FontSize="11" Margin="0,0,3,0"/>
                                                 <TextBlock Text="{Binding FontSize}" Foreground="#4CAF50" FontSize="11" FontWeight="SemiBold"/>
-                                            </StackPanel>
-
-                                            <StackPanel Orientation="Horizontal" 
-                                                        Visibility="{Binding Alignment, Converter={StaticResource NullToVisibilityConverter}}">
-                                                <TextBlock Text="{x:Static res:Strings.Alignment}" Foreground="#B0B0B0" FontSize="11" Margin="0,0,3,0"/>
-                                                <TextBlock Text="{Binding Alignment}" Foreground="#00BCD4" FontSize="11" FontWeight="SemiBold"/>
                                             </StackPanel>
 
                                             <StackPanel Orientation="Horizontal" 
@@ -745,20 +808,12 @@
                                                                 IsSnapToTickEnabled="True"
                                                                 Margin="0,0,8,0"/>
                                                         <TextBlock Grid.Column="1"
-                                                                  Text="{Binding FontSize, StringFormat={}{0:px}}"
+                                                                  Text="{Binding FontSize, StringFormat={}{0}px}"
                                                                   Foreground="White"
                                                                   FontSize="11"
                                                                   VerticalAlignment="Center"
                                                                   HorizontalAlignment="Center"/>
                                                     </Grid>
-                                                </StackPanel>
-
-                                                <!-- Alignment Editor -->
-                                                <StackPanel Visibility="{Binding HasAlignment, Converter={StaticResource BoolToVisibilityConverter}}">
-                                                    <TextBlock Text="Lerrokatzea:" Foreground="#B0B0B0" FontSize="10" Margin="0,0,0,4"/>
-                                                    <ComboBox ItemsSource="{Binding AvailableAlignments}"
-                                                             SelectedItem="{Binding Alignment, Mode=TwoWay}"
-                                                             Height="30"/>
                                                 </StackPanel>
 
                                                 <!-- Days Editor -->
@@ -785,6 +840,26 @@
                                                                   HorizontalAlignment="Center"/>
                                                     </Grid>
                                                 </StackPanel>
+                                                
+                                                <!-- Alignment Info (Locked to Center) -->
+                                                <Border Background="#1A2332"
+                                                        BorderBrush="#4CAF50"
+                                                        BorderThickness="1"
+                                                        CornerRadius="8"
+                                                        Padding="8"
+                                                        Margin="0,0,0,8">
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                        <TextBlock Text="📍" 
+                                                                  FontSize="12"
+                                                                  VerticalAlignment="Center"
+                                                                  Margin="0,0,5,0"/>
+                                                        <TextBlock Text="Lerrokatzea: Zentratuta" 
+                                                                  Foreground="#4CAF50" 
+                                                                  FontSize="10"
+                                                                  FontWeight="SemiBold"
+                                                                  VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Border>
                                             </StackPanel>
                                         </Border>
                                     </Grid>
@@ -829,9 +904,8 @@
                                 <TextBlock Text="12:30" 
                                           Foreground="White" 
                                           FontSize="10" 
-                                          HorizontalAlignment="Left"
-                                          VerticalAlignment="Center"
-                                          Margin="15,0,0,0"/>
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
                                 <StackPanel Orientation="Horizontal" 
                                            HorizontalAlignment="Right"
                                            VerticalAlignment="Center"

@@ -44,6 +44,7 @@ namespace Climaster_feature.Converters
             {
                 return type switch
                 {
+                    "location_name" => Strings.LocationDisplay,
                     "current_temp" => Strings.TempDisplay,
                     "current_condition_text" => Strings.ConditionDisplay,
                     "horizontal_divider" => Strings.DividerDisplay,

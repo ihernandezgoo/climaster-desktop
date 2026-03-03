@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Climaster_feature.Models;
@@ -51,7 +51,7 @@ namespace Climaster_feature.Views
         {
             if (d is AndroidWidgetPreview preview)
             {
-                // Unsubscribe from previous collection and its items
+                // Aurreko bildumaren eta bere elementuen harpidetzak kendu
                 if (preview._previousCollection != null)
                 {
                     preview._previousCollection.CollectionChanged -= preview.OnCollectionChanged;
@@ -61,7 +61,7 @@ namespace Climaster_feature.Views
                     }
                 }
 
-                // Subscribe to new collection and its items
+                // Bilduma berrira eta bere elementuetara harpidetu
                 if (e.NewValue is ObservableCollection<WidgetElement> newCollection)
                 {
                     newCollection.CollectionChanged += preview.OnCollectionChanged;
@@ -78,7 +78,7 @@ namespace Climaster_feature.Views
 
         private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            // Subscribe to new items
+            // Elementu berrietara harpidetu
             if (e.NewItems != null)
             {
                 foreach (WidgetElement item in e.NewItems)
@@ -87,7 +87,7 @@ namespace Climaster_feature.Views
                 }
             }
 
-            // Unsubscribe from old items
+            // Elementu zaharretako harpidetzak kendu
             if (e.OldItems != null)
             {
                 foreach (WidgetElement item in e.OldItems)
@@ -96,14 +96,14 @@ namespace Climaster_feature.Views
                 }
             }
 
-            // Re-render when collection changes
+            // Bilduma aldatzen denean berriz renderizatu
             RenderWidget();
         }
 
         private void OnElementPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            // Re-render when any element property changes
-            // Ignore IsSelected changes as they don't affect rendering
+            // Edozein elementuren propietate aldatzen denean berriz renderizatu
+            // IsSelected aldaketak ez ditu renderizazioan eraginik
             if (e.PropertyName != nameof(WidgetElement.IsSelected))
             {
                 RenderWidget();
@@ -116,7 +116,7 @@ namespace Climaster_feature.Views
 
             if (LayoutElements == null) return;
 
-            // Set background
+            // Atzeko kolorea ezarri
             try
             {
                 var converter = new BrushConverter();
@@ -128,7 +128,7 @@ namespace Climaster_feature.Views
                 WidgetContainer.Background = new SolidColorBrush(Color.FromArgb(51, 255, 255, 255));
             }
 
-            // Render elements
+            // Elementuak renderizatu
             foreach (var element in LayoutElements)
             {
                 var control = CreateElementControl(element);
@@ -143,22 +143,37 @@ namespace Climaster_feature.Views
         {
             return element.Type switch
             {
+                "location_name" => CreateLocationControl(element),
                 "current_temp" => CreateTempControl(element),
                 "current_condition_text" => CreateConditionControl(element),
                 "horizontal_divider" => CreateDivider(),
                 "daily_forecast_row" => CreateDailyForecast(element),
-                "humidity" => CreateInfoControl("??", "Humedad: 65%", element),
-                "wind_speed" => CreateInfoControl("???", "Viento: 15 km/h", element),
-                "hourly_forecast" => CreateHourlyForecast(),
+                "humidity" => CreateInfoControl("💧", "Hezetasuna: 65%", element),
+                "wind_speed" => CreateInfoControl("🌬️", "Haizea: 15 km/h", element),
                 _ => null
             };
+        }
+
+        private TextBlock CreateLocationControl(WidgetElement element)
+        {
+            var tb = new TextBlock
+            {
+                Text = "📍 Donostia, Gipuzkoa",
+                FontSize = element.FontSize ?? 18,
+                FontWeight = FontWeights.SemiBold,
+                Foreground = new SolidColorBrush(Color.FromRgb(76, 175, 80)),
+                Margin = new Thickness(0, 5, 0, 10),
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+
+            return tb;
         }
 
         private TextBlock CreateTempControl(WidgetElement element)
         {
             var tb = new TextBlock
             {
-                Text = "24�",
+                Text = "24°",
                 FontSize = element.FontSize ?? 48,
                 FontWeight = FontWeights.Bold,
                 Foreground = Brushes.White,
@@ -177,7 +192,7 @@ namespace Climaster_feature.Views
         {
             var tb = new TextBlock
             {
-                Text = "Parcialmente nublado",
+                Text = "Partzialki hodeitsu",
                 FontSize = element.FontSize ?? 20,
                 Foreground = new SolidColorBrush(Color.FromRgb(200, 200, 200)),
                 Margin = new Thickness(0, 0, 0, 10)
@@ -206,7 +221,8 @@ namespace Climaster_feature.Views
             var stack = new StackPanel
             {
                 Orientation = Orientation.Horizontal,
-                Margin = new Thickness(0, 5, 0, 5)
+                Margin = new Thickness(0, 5, 0, 5),
+                HorizontalAlignment = HorizontalAlignment.Center
             };
 
             stack.Children.Add(new TextBlock
@@ -229,8 +245,8 @@ namespace Climaster_feature.Views
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             }
 
-            string[] dayNames = { "Lun", "Mar", "Mi�", "Jue", "Vie", "S�b", "Dom" };
-            string[] icons = { "??", "?", "??" };
+            string[] dayNames = { "Al", "Ar", "Az", "Og", "Or", "Lr", "Ig" };
+            string[] icons = { "☀️", "⛅", "🌧" };
 
             for (int i = 0; i < days; i++)
             {
@@ -257,7 +273,7 @@ namespace Climaster_feature.Views
 
                 dayStack.Children.Add(new TextBlock
                 {
-                    Text = $"{22 + i}�",
+                    Text = $"{22 + i}°",
                     Foreground = Brushes.White,
                     FontSize = 16,
                     FontWeight = FontWeights.SemiBold,
@@ -269,55 +285,6 @@ namespace Climaster_feature.Views
             }
 
             return grid;
-        }
-
-        private ScrollViewer CreateHourlyForecast()
-        {
-            var scroll = new ScrollViewer
-            {
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
-                Margin = new Thickness(0, 10, 0, 10)
-            };
-
-            var stack = new StackPanel { Orientation = Orientation.Horizontal };
-
-            for (int i = 0; i < 6; i++)
-            {
-                var hourStack = new StackPanel
-                {
-                    Margin = new Thickness(0, 0, 15, 0)
-                };
-
-                hourStack.Children.Add(new TextBlock
-                {
-                    Text = $"{12 + i}:00",
-                    Foreground = new SolidColorBrush(Color.FromRgb(180, 180, 180)),
-                    FontSize = 11,
-                    HorizontalAlignment = HorizontalAlignment.Center
-                });
-
-                hourStack.Children.Add(new TextBlock
-                {
-                    Text = i % 2 == 0 ? "??" : "??",
-                    FontSize = 20,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    Margin = new Thickness(0, 5, 0, 5)
-                });
-
-                hourStack.Children.Add(new TextBlock
-                {
-                    Text = $"{23 + i}�",
-                    Foreground = Brushes.White,
-                    FontSize = 14,
-                    HorizontalAlignment = HorizontalAlignment.Center
-                });
-
-                stack.Children.Add(hourStack);
-            }
-
-            scroll.Content = stack;
-            return scroll;
         }
     }
 }

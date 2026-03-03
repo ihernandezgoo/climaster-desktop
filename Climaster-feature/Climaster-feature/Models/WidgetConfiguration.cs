@@ -31,6 +31,12 @@ namespace Climaster_feature.Models
 
         [JsonPropertyName("gridHeight")]
         public int GridHeight { get; set; } = 2;
+
+        [JsonPropertyName("horizontalAlignment")]
+        public string HorizontalAlignment { get; set; } = "center";
+
+        [JsonPropertyName("verticalAlignment")]
+        public string VerticalAlignment { get; set; } = "center";
     }
 
     public class WidgetBackground
@@ -43,13 +49,16 @@ namespace Climaster_feature.Models
 
         [JsonPropertyName("cornerRadius")]
         public int CornerRadius { get; set; } = 24;
+
+        [JsonPropertyName("padding")]
+        public int Padding { get; set; } = 16;
     }
 
     public class WidgetElement : ViewModelBase
     {
         private string _type = string.Empty;
         private int? _fontSize;
-        private string? _alignment;
+        private string _alignment = "center"; // Lehenetsita zentratuta
         private int? _days;
         private bool _isSelected;
 
@@ -75,8 +84,7 @@ namespace Climaster_feature.Models
         }
 
         [JsonPropertyName("alignment")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? Alignment
+        public string Alignment
         {
             get => _alignment;
             set
@@ -102,7 +110,7 @@ namespace Climaster_feature.Models
             }
         }
 
-        // UI-only property
+        // UI-rako propietatea soilik
         [JsonIgnore]
         public bool IsSelected
         {
@@ -110,7 +118,7 @@ namespace Climaster_feature.Models
             set => SetProperty(ref _isSelected, value);
         }
 
-        // Propiedades auxiliares para UI
+        // UI-rako propietate laguntzaileak
         [JsonIgnore]
         public bool HasFontSize => FontSize.HasValue;
 
@@ -124,7 +132,7 @@ namespace Climaster_feature.Models
         public List<string> AvailableAlignments { get; } = new() { "left", "center", "right" };
     }
 
-    // Clase auxiliar para tamaños predefinidos
+    // Tamaina aurredefinituetarako klase laguntzailea
     public class WidgetGridSize
     {
         public int Width { get; set; }

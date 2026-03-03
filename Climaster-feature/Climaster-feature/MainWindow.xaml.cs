@@ -35,7 +35,8 @@ namespace Climaster_feature
         {
             if (sender is Button button && button.Tag is string color && DataContext is MainViewModel vm)
             {
-                vm.BackgroundColor = color;
+                // Set the base color (without alpha channel)
+                vm.BaseColor = color;
             }
         }
 

@@ -32,6 +32,7 @@
         public const string Divider = "➖ Zatitzailea";
         public const string DailyForecast = "📅 Eguneko Iragarpena";
         public const string HourlyForecast = "⏰ Orduko Iragarpena";
+        public const string LocationName = "📍 Kokapena";
 
         // Nombres de elementos para display
         public const string TempDisplay = "🌡️ Uneko Tenperatura";
@@ -41,6 +42,7 @@
         public const string DividerDisplay = "➖ Zatitzaile Horizontala";
         public const string DailyDisplay = "📅 Eguneko Iragarpena";
         public const string HourlyDisplay = "⏰ Orduko Iragarpena";
+        public const string LocationDisplay = "📍 Kokapenaren Izena";
 
         // Propiedades de elementos
         public const string FontSize = "Tamaina:";

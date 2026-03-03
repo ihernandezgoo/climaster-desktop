@@ -17,6 +17,8 @@ namespace Climaster_feature.ViewModels
 
         private string _widgetId = "custom_widget_v1";
         private string _backgroundColor = "#33FFFFFF";
+        private string _baseColor = "#FFFFFF"; // Kolorea alpha gabe
+        private int _backgroundOpacity = 20; // 0-100 (20 = 33 hex-en)
         private int _cornerRadius = 24;
         private string _previewJson = string.Empty;
         private bool _isServerRunning = false;
@@ -30,11 +32,11 @@ namespace Climaster_feature.ViewModels
             _qrCodeService = new QRCodeService();
             _serverService = new LocalServerService();
 
-            // Initialize available sizes
+            // Eskuragarri dauden tamainak hasieratu
             InitializeWidgetSizes();
-            _selectedSize = AvailableSizes[3]; // Default: 4x2 (Ertaina)
+            _selectedSize = AvailableSizes[3]; // Lehenetsia: 4x2 (Ertaina)
 
-            // Commands
+            // Komandoak
             AddElementCommand = new RelayCommand<string>(AddElement);
             RemoveElementCommand = new RelayCommand<WidgetElement>(RemoveElement);
             MoveUpCommand = new RelayCommand<WidgetElement>(MoveUp);
@@ -46,7 +48,7 @@ namespace Climaster_feature.ViewModels
             SaveJsonCommand = new RelayCommand(SaveJson);
             SelectElementCommand = new RelayCommand<WidgetElement>(SelectElement);
 
-            // Subscribe to property changes in LayoutElements
+            // LayoutElements-eko propietate aldaketei harpidetu
             LayoutElements.CollectionChanged += (s, e) =>
             {
                 if (e.NewItems != null)
@@ -63,7 +65,7 @@ namespace Climaster_feature.ViewModels
                 UpdatePreviewJson();
             };
 
-            // Initialize with default elements
+            // Hasierako elementuekin hasieratu
             LayoutElements.Add(new WidgetElement { Type = "current_temp", FontSize = 48, Alignment = "center" });
             LayoutElements.Add(new WidgetElement { Type = "current_condition_text", FontSize = 20, Alignment = "center" });
             
@@ -74,9 +76,9 @@ namespace Climaster_feature.ViewModels
         public ObservableCollection<WidgetGridSize> AvailableSizes { get; } = new();
         public ObservableCollection<string> PredefinedColors { get; } = new()
         {
-            "#33FFFFFF", "#55000000", "#77FFFFFF", "#99000000",
-            "#554CAF50", "#55F44336", "#552196F3", "#55FF9800",
-            "#55FFC107", "#5500BCD4", "#559C27B0", "#55FF5722"
+            "#FFFFFF", "#000000", "#FFFFFF", "#000000",
+            "#4CAF50", "#F44336", "#2196F3", "#FF9800",
+            "#FFC107", "#00BCD4", "#9C27B0", "#FF5722"
         };
 
         public WidgetElement? SelectedElement
@@ -127,10 +129,10 @@ namespace Climaster_feature.ViewModels
             get
             {
                 double percentage = UsedSpacePercentage;
-                if (percentage >= 90) return "#F44336"; // Red
-                if (percentage >= 70) return "#FF9800"; // Orange
-                if (percentage >= 50) return "#FFC107"; // Yellow
-                return "#4CAF50"; // Green
+                if (percentage >= 90) return "#F44336"; // Gorria
+                if (percentage >= 70) return "#FF9800"; // Laranja
+                if (percentage >= 50) return "#FFC107"; // Horia
+                return "#4CAF50"; // Berdea
             }
         }
         public string WidgetId
@@ -143,13 +145,44 @@ namespace Climaster_feature.ViewModels
             }
         }
 
+        public string BaseColor
+        {
+            get => _baseColor;
+            set
+            {
+                if (SetProperty(ref _baseColor, value))
+                {
+                    UpdateBackgroundColorFromComponents();
+                }
+            }
+        }
+
+        public int BackgroundOpacity
+        {
+            get => _backgroundOpacity;
+            set
+            {
+                if (SetProperty(ref _backgroundOpacity, value))
+                {
+                    OnPropertyChanged(nameof(OpacityPercentage));
+                    UpdateBackgroundColorFromComponents();
+                }
+            }
+        }
+
+        public string OpacityPercentage => $"{BackgroundOpacity}%";
+
         public string BackgroundColor
         {
             get => _backgroundColor;
             set
             {
                 if (SetProperty(ref _backgroundColor, value))
+                {
+                    // Kolore hex balioaren baitako kolorea eta opazioa atertu
+                    ExtractColorComponents(value);
                     UpdatePreviewJson();
+                }
             }
         }
 
@@ -200,13 +233,13 @@ namespace Climaster_feature.ViewModels
 
         private void SelectElement(WidgetElement? element)
         {
-            // Deselect all elements first
+            // Lehenik elementu guztiak desautatu
             foreach (var el in LayoutElements)
             {
                 el.IsSelected = false;
             }
             
-            // Select the clicked element
+            // Klik egin zaion elementua hautatu
             if (element != null)
             {
                 element.IsSelected = true;
@@ -217,7 +250,7 @@ namespace Climaster_feature.ViewModels
 
         private void InitializeWidgetSizes()
         {
-            // Tamaños más realistas basados en espacio real
+            // Widget tamaina errealistagoak espazio errealean oinarrituta
             AvailableSizes.Add(new WidgetGridSize
             {
                 Width = 2,
@@ -235,7 +268,7 @@ namespace Climaster_feature.ViewModels
                 DisplayName = "Txikia Horizontala (4x1)",
                 Description = "Lerro bakarreko informazioa",
                 MaxElements = 8, // 8 unidades
-                RecommendedElements = new List<string> { "Tenperatura", "Baldintza" }
+                RecommendedElements = new List<string> { "Kokapena", "Tenperatura" }
             });
 
             AvailableSizes.Add(new WidgetGridSize
@@ -245,7 +278,7 @@ namespace Climaster_feature.ViewModels
                 DisplayName = "Karratua Txikia (2x2)",
                 Description = "Informazio oinarrizkoa bertikala",
                 MaxElements = 8,
-                RecommendedElements = new List<string> { "Tenperatura", "Baldintza", "Hezetasuna" }
+                RecommendedElements = new List<string> { "Kokapena", "Tenperatura", "Baldintza" }
             });
 
             AvailableSizes.Add(new WidgetGridSize
@@ -255,7 +288,7 @@ namespace Climaster_feature.ViewModels
                 DisplayName = "Ertaina (4x2)",
                 Description = "Informazio osoa oinarrizkoa",
                 MaxElements = 16,
-                RecommendedElements = new List<string> { "Tenperatura", "Baldintza", "Hezetasuna", "Haizea", "Zatitzailea" }
+                RecommendedElements = new List<string> { "Kokapena", "Tenperatura", "Baldintza", "Hezetasuna", "Haizea" }
             });
 
             AvailableSizes.Add(new WidgetGridSize
@@ -265,7 +298,7 @@ namespace Climaster_feature.ViewModels
                 DisplayName = "Handia (4x3)",
                 Description = "Informazio zabala eguneko iragarpena",
                 MaxElements = 24,
-                RecommendedElements = new List<string> { "Tenperatura", "Baldintza", "Hezetasuna", "Haizea", "Zatitzailea", "Eguneko Iragarpena (3 egun)" }
+                RecommendedElements = new List<string> { "Kokapena", "Tenperatura", "Baldintza", "Hezetasuna", "Haizea", "Zatitzailea", "Eguneko Iragarpena (3 egun)" }
             });
 
             AvailableSizes.Add(new WidgetGridSize
@@ -275,7 +308,7 @@ namespace Climaster_feature.ViewModels
                 DisplayName = "Oso Handia (4x4)",
                 Description = "Informazio osoa detallatua",
                 MaxElements = 32,
-                RecommendedElements = new List<string> { "Tenperatura", "Baldintza", "Hezetasuna", "Haizea", "Zatitzailea", "Eguneko Iragarpena (5 egun)", "Orduko Iragarpena" }
+                RecommendedElements = new List<string> { "Kokapena", "Tenperatura", "Baldintza", "Hezetasuna", "Haizea", "Zatitzailea", "Eguneko Iragarpena (5 egun)", "Orduko Iragarpena" }
             });
 
             AvailableSizes.Add(new WidgetGridSize
@@ -291,16 +324,17 @@ namespace Climaster_feature.ViewModels
 
         private int GetElementSize(string elementType)
         {
-            // Espacio que ocupa cada elemento (en unidades)
+            // Elementu bakoitzak hartzen duen espazioa (unitateetan)
             return elementType switch
             {
-                "current_temp" => 4,              // Temperatura grande ocupa mucho (4x1)
-                "current_condition_text" => 2,     // Condición texto (2x1)
-                "humidity" => 2,                   // Humedad (2x0.5)
-                "wind_speed" => 2,                 // Viento (2x0.5)
-                "horizontal_divider" => 1,         // Divisor (4x pequeño)
-                "daily_forecast_row" => 8,         // Previsión diaria (4x2 aprox)
-                "hourly_forecast" => 6,            // Previsión horaria (4x1.5)
+                "location_name" => 2,              // Kokapenaren izena (2x0.5)
+                "current_temp" => 4,              // Tenperatura handia espazio asko hartzen du (4x1)
+                "current_condition_text" => 2,     // Baldintza testua (2x1)
+                "humidity" => 2,                   // Hezetasuna (2x0.5)
+                "wind_speed" => 2,                 // Haizea (2x0.5)
+                "horizontal_divider" => 1,         // Zatitzailea (4x txikia)
+                "daily_forecast_row" => 8,         // Eguneko iragarpena (4x2 gutxi gorabehera)
+                "hourly_forecast" => 6,            // Orduko iragarpena (4x1.5)
                 _ => 2
             };
         }
@@ -316,21 +350,22 @@ namespace Climaster_feature.ViewModels
 
             var newElement = elementType switch
             {
+                "location_name" => new WidgetElement { Type = "location_name", FontSize = 18, Alignment = "center" },
                 "current_temp" => new WidgetElement { Type = "current_temp", FontSize = 48, Alignment = "center" },
                 "current_condition_text" => new WidgetElement { Type = "current_condition_text", FontSize = 20, Alignment = "center" },
-                "horizontal_divider" => new WidgetElement { Type = "horizontal_divider" },
-                "daily_forecast_row" => new WidgetElement { Type = "daily_forecast_row", Days = 3 },
-                "humidity" => new WidgetElement { Type = "humidity", FontSize = 16, Alignment = "left" },
-                "wind_speed" => new WidgetElement { Type = "wind_speed", FontSize = 16, Alignment = "left" },
-                "hourly_forecast" => new WidgetElement { Type = "hourly_forecast" },
-                _ => new WidgetElement { Type = elementType }
+                "horizontal_divider" => new WidgetElement { Type = "horizontal_divider", Alignment = "center" },
+                "daily_forecast_row" => new WidgetElement { Type = "daily_forecast_row", Days = 3, Alignment = "center" },
+                "humidity" => new WidgetElement { Type = "humidity", FontSize = 16, Alignment = "center" },
+                "wind_speed" => new WidgetElement { Type = "wind_speed", FontSize = 16, Alignment = "center" },
+                "hourly_forecast" => new WidgetElement { Type = "hourly_forecast", Alignment = "center" },
+                _ => new WidgetElement { Type = elementType, Alignment = "center" }
             };
 
             int elementSize = GetElementSize(elementType);
             int currentSize = CalculateTotalElementSize();
             int newTotalSize = currentSize + elementSize;
 
-            // Validar si cabe el elemento
+            // Elementua sartzen den balidatu
             if (newTotalSize > SelectedSize.MaxElements)
             {
                 MessageBox.Show(
@@ -564,6 +599,65 @@ namespace Climaster_feature.ViewModels
                 },
                 Layout = new List<WidgetElement>(LayoutElements)
             };
+        }
+
+        private void ExtractColorComponents(string hexColor)
+        {
+            if (string.IsNullOrEmpty(hexColor) || hexColor.Length < 7)
+                return;
+
+            try
+            {
+                if (hexColor.StartsWith("#") && hexColor.Length >= 9)
+                {
+                    // Alpha atera eta ehunekora bihurtu
+                    string alpha = hexColor.Substring(1, 2);
+                    int alphaValue = Convert.ToInt32(alpha, 16);
+                    _backgroundOpacity = (int)((alphaValue / 255.0) * 100);
+                    OnPropertyChanged(nameof(BackgroundOpacity));
+                    OnPropertyChanged(nameof(OpacityPercentage));
+
+                    // RGB atera
+                    _baseColor = "#" + hexColor.Substring(3);
+                    OnPropertyChanged(nameof(BaseColor));
+                }
+                else if (hexColor.StartsWith("#") && hexColor.Length == 7)
+                {
+                    _baseColor = hexColor;
+                    OnPropertyChanged(nameof(BaseColor));
+                }
+            }
+            catch
+            {
+                // Analisia huts egiten badu, uneko balioak mantendu
+            }
+        }
+
+        private void UpdateBackgroundColorFromComponents()
+        {
+            try
+            {
+                // Gardentasun ehunekoa hex alpha-ra bihurtu
+                int alphaValue = (int)((BackgroundOpacity / 100.0) * 255);
+                string alpha = alphaValue.ToString("X2");
+
+                // # kendu oinarrizko koloretik badago
+                string rgb = BaseColor.TrimStart('#');
+
+                // Ziurtatu RGB 6 karaktere dituela
+                if (rgb.Length != 6)
+                    rgb = "FFFFFF";
+
+                _backgroundColor = $"#{alpha}{rgb}";
+                OnPropertyChanged(nameof(BackgroundColor));
+                UpdatePreviewJson();
+            }
+            catch
+            {
+                // Bihurketak huts egiten badu, lehenetsia erabili
+                _backgroundColor = "#33FFFFFF";
+                OnPropertyChanged(nameof(BackgroundColor));
+            }
         }
     }
 }
