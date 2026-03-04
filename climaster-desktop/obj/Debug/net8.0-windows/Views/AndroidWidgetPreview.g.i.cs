@@ -68,7 +68,7 @@ namespace Climaster_feature.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/Climaster-feature;component/views/androidwidgetpreview.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Climaster-desktop;component/views/androidwidgetpreview.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\AndroidWidgetPreview.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

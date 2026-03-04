@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "72eVfuHxM1g=",
+  "dgSpecHash": "vJb2RnC18mc=",
   "success": true,
-  "projectFilePath": "D:\\climaster-desktop\\Climaster-feature\\Climaster-feature\\Climaster-feature.csproj",
+  "projectFilePath": "C:\\Users\\ik012982i18\\Music\\climaster-desktop\\climaster-desktop\\Climaster-desktop.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ik012982i18\\.nuget\\packages\\microsoft.win32.systemevents\\10.0.3\\microsoft.win32.systemevents.10.0.3.nupkg.sha512",
     "C:\\Users\\ik012982i18\\.nuget\\packages\\qrcoder\\1.7.0\\qrcoder.1.7.0.nupkg.sha512",

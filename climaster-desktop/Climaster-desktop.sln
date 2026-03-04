@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36414.22 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Climaster-feature", "Climaster-feature\Climaster-feature.csproj", "{02553DE7-93BD-420E-91EE-84557D7350D2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Climaster-desktop", "Climaster-desktop.csproj", "{A08B313C-DDE8-6308-5E19-A4C8ED09B8C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{02553DE7-93BD-420E-91EE-84557D7350D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{02553DE7-93BD-420E-91EE-84557D7350D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{02553DE7-93BD-420E-91EE-84557D7350D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{02553DE7-93BD-420E-91EE-84557D7350D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A08B313C-DDE8-6308-5E19-A4C8ED09B8C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A08B313C-DDE8-6308-5E19-A4C8ED09B8C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A08B313C-DDE8-6308-5E19-A4C8ED09B8C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A08B313C-DDE8-6308-5E19-A4C8ED09B8C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C4928240-7BEA-487C-B49F-4C8346B72029}
+		SolutionGuid = {9E119F65-49E3-41C0-BB05-9DC8C715E0B2}
 	EndGlobalSection
 EndGlobal
