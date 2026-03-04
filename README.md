@@ -129,16 +129,6 @@ Hautatu widget-aren tamaina (gomendatua: **4x2 Ertaina**).
 
 ---
 
-## 🧯 Arazo arruntak
-
-### ❌ "Ezin da elementua gehitu"
-
-**Konponbidea**: hautatu tamaina handiagoa edo kendu elementu batzuk.
-
-### 📍 Widget-a ezkerrean agertzen da Android-en
-
-**Konponbidea**: egiaztatu JSON-an `"alignment": "center"` ezarrita dagoela.
-
 ### 📦 QR kodea handiegia da
 
 **Konponbidea**: murriztu elementu kopurua edo edukia sinplifikatu.
